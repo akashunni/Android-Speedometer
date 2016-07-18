@@ -15,14 +15,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Advertisement
-        MobileAds.initialize(this,"ca-app-pub-6048897646109743~2196223717");
-        adView = (AdView) findViewById(R.id.ad_view);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("4452FDFD67C3423B85C9D44D8075C23D")
-                .build();
-        adView.loadAd(adRequest);
+        // Advertisement details are hidden due to privacy.
+
 
     }
 

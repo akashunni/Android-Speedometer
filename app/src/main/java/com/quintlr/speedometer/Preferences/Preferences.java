@@ -1,8 +1,10 @@
-package com.quintlr.speedometer;
+package com.quintlr.speedometer.Preferences;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
+
+import com.quintlr.speedometer.R;
 
 public class Preferences extends AppCompatActivity {
 

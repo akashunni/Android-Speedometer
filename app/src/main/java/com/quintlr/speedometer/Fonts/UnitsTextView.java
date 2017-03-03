@@ -1,4 +1,4 @@
-package com.quintlr.speedometer;
+package com.quintlr.speedometer.Fonts;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import com.quintlr.speedometer.Fonts.FontFactory;
 
 /**
  * Created by Akash on 7/19/2016.

@@ -19,13 +19,7 @@
         android:name="android.support.multidex.MultiDexApplication"
         android:theme="@style/MyAppTheme"
         >
-        <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustNothing">
-            <intent-filter>
-                <action android:name="android.intent.action.DEFAULT" />
-            </intent-filter>
-        </activity>
+
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
@@ -41,13 +35,19 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <activity
+            android:name=".Activities.MainActivity"
+            android:windowSoftInputMode="adjustNothing">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Preferences.Preferences"
+            android:parentActivityName=".Activities.MainActivity" />
 
         <activity
-            android:name=".Preferences"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".Splash_Screen"
+            android:name=".Activities.Splash_Screen"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,7 +55,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Instructions"
+        <activity android:name=".Activities.Instructions"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />

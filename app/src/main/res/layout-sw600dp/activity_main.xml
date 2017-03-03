@@ -28,6 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@android:color/transparent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
         android:layout_alignBottom="@id/separator_adview"
         android:src="@drawable/gps_icon"/-->
 
@@ -35,6 +37,7 @@
         android:id="@+id/curr_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:src="@drawable/current_location_white"
@@ -44,6 +47,7 @@
         android:id="@+id/search_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:layout_toRightOf="@id/curr_location"
@@ -54,6 +58,7 @@
         android:id="@+id/map_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:layout_toRightOf="@id/search_btn"
@@ -64,6 +69,7 @@
         android:id="@+id/zoom_out"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:layout_toRightOf="@id/map_type"
@@ -74,6 +80,7 @@
         android:id="@+id/settingsbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:src="@drawable/settings_icon"
@@ -88,15 +95,30 @@
         android:background="@color/pureWhite"/>
 
     <!-- Odometer -->
+
+    <Button
+        android:id="@+id/reset_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:textColor="@color/pitchBlack"
+        android:textSize="15sp"
+        android:layout_alignBottom="@id/separator_toggles"
+        android:padding="0dp"
+        android:background="@drawable/reset_button"
+        android:layout_alignParentRight="true"
+        android:text="RESET"
+        />
+
     <com.quintlr.speedometer.ValuesTextView
         android:id="@+id/odometerbg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/separator_toggles"
-        android:layout_marginBottom="15dp"
-        android:layout_marginLeft="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="22.5dp"
         android:textColor="@color/lcdbg"
-        android:textSize="25sp"
+        android:textSize="45sp"
         android:text="~~~~~"
         />
 
@@ -108,7 +130,7 @@
         android:layout_alignTop="@id/odometerbg"
         android:layout_alignRight="@id/odometerbg"
         android:gravity="right"
-        android:textSize="25sp"
+        android:textSize="45sp"
         android:text="-----"
         />
 
@@ -116,10 +138,9 @@
         android:id="@+id/odometerunitsbg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/odometerbg"
         android:layout_toRightOf="@id/odometerbg"
-        android:layout_marginLeft="15dp"
-        android:textSize="15sp"
+        android:layout_alignBottom="@id/odometerbg"
+        android:textSize="30sp"
         android:textColor="@color/lcdbg"
         android:text="~~"
         />
@@ -130,28 +151,18 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/odometerunitsbg"
         android:layout_alignTop="@id/odometerunitsbg"
-        android:textSize="15sp"
+        android:textSize="30sp"
         android:text="km"
         />
 
-    <Button
-        android:id="@+id/reset_btn"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:textColor="@color/pitchBlack"
-        android:layout_marginBottom="0dp"
-        android:layout_alignBottom="@id/separator_toggles"
-        android:padding="0dp"
-        android:background="@drawable/reset_button"
-        android:layout_alignParentRight="true"
-        android:text="RESET"
-        />
+
+
 
     <View
         android:id="@+id/separator_odo"
         android:layout_width="fill_parent"
         android:layout_above="@id/odometerbg"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="22.5dp"
         android:layout_height="2dp"
         android:background="@color/pureWhite"/>
 
@@ -161,11 +172,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/odometerbg"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="45dp"
+        android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true"
         android:textColor="@color/lcdbg"
-        android:textSize="15sp"
+        android:textSize="37.5sp"
         android:text="~~~~~"
         />
 
@@ -176,7 +187,7 @@
         android:layout_alignLeft="@id/speedounitsbg"
         android:layout_alignRight="@id/speedounitsbg"
         android:layout_alignTop="@id/speedounitsbg"
-        android:textSize="15sp"
+        android:textSize="37.5sp"
         android:text="km/hr"
         />
 
@@ -185,9 +196,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/speedounitsbg"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="15dp"
         android:layout_centerHorizontal="true"
-        android:textSize="50sp"
+        android:textSize="105sp"
         android:text="~~~~"
         android:textColor="@color/lcdbg"
         />
@@ -201,7 +212,7 @@
         android:layout_alignLeft="@id/speedobg"
         android:gravity="right"
         android:singleLine="true"
-        android:textSize="50sp"
+        android:textSize="105sp"
         android:text="----"
         />
 
@@ -209,7 +220,7 @@
         android:id="@+id/separator_speedo"
         android:layout_width="fill_parent"
         android:layout_above="@id/speedobg"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="22.5dp"
         android:layout_height="2dp"
         android:background="@color/pureWhite"/>
 
@@ -219,10 +230,10 @@
         android:layout_height="wrap_content"
         android:textColor="@color/pureWhite"
         android:layout_above="@id/separator_speedo"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:textSize="15sp"
-        android:text="Pos : (00.00, 00.00)"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:textSize="22.5sp"
+        android:text="Position : (00.00, 00.00)"
         />
 
 
@@ -230,7 +241,7 @@
         android:id="@+id/separator_lat_long"
         android:layout_width="fill_parent"
         android:layout_above="@id/position"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="15dp"
         android:layout_height="2dp"
         android:background="@color/pureWhite"/>
 
@@ -241,21 +252,8 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toRightOf="@id/position"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="15dp"
         android:background="@color/pureWhite"/>
-
-    <TextView
-        android:id="@+id/altitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/pureWhite"
-        android:layout_alignBaseline="@id/position"
-        android:layout_toRightOf="@id/divider_pos_alt"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:textSize="15sp"
-        android:text="Alt : 0 m"
-        />
 
     <View
         android:id="@+id/divider_alt_dir"
@@ -264,6 +262,7 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toRightOf="@id/altitude"
+        android:layout_marginLeft="10dp"
         android:background="@color/pureWhite"/>
 
     <TextView
@@ -273,11 +272,12 @@
         android:textColor="@color/pureWhite"
         android:layout_alignBaseline="@id/position"
         android:layout_toRightOf="@id/divider_alt_dir"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:textSize="15sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textSize="22.5sp"
         android:text="Dir : NA"
         />
+
 
 
     <ImageButton
@@ -290,8 +290,10 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
         android:src="@drawable/info_box"
         />
+
 
     <View
         android:id="@+id/divider_alt_info"
@@ -301,13 +303,27 @@
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toLeftOf="@id/more_info"
         android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
         android:background="@color/pureWhite"/>
+
+    <TextView
+        android:id="@+id/altitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/pureWhite"
+        android:layout_alignBaseline="@id/position"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@id/divider_pos_alt"
+        android:layout_marginRight="15dp"
+        android:textSize="22.5sp"
+        android:text="Altitude : 0 m"
+        />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/divider_pos_alt"
+        android:layout_above="@id/separator_lat_long"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
 

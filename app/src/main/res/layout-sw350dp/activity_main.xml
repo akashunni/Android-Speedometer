@@ -23,60 +23,65 @@
         android:layout_height="2dp"
         android:background="@color/pureWhite"/>
 
-    <!--ImageButton
-        android:id="@+id/gpsbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
-        android:layout_alignBottom="@id/separator_adview"
-        android:src="@drawable/gps_icon"/-->
-
     <ImageButton
         android:id="@+id/curr_location"
+        android:contentDescription="Current Location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
+        android:padding="10dp"
+        android:background="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:src="@drawable/current_location_white"
         />
 
     <ImageButton
         android:id="@+id/search_btn"
+        android:contentDescription="Search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
+        android:padding="10dp"
+        android:background="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:layout_toRightOf="@id/curr_location"
+        android:layout_toEndOf="@id/curr_location"
         android:src="@drawable/search_icon"
         />
 
     <ImageButton
         android:id="@+id/map_type"
+        android:contentDescription="Map Type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
+        android:padding="10dp"
+        android:background="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:layout_toRightOf="@id/search_btn"
+        android:layout_toEndOf="@id/search_btn"
         android:src="@drawable/map_type_white"
         />
 
     <ImageButton
         android:id="@+id/zoom_out"
+        android:contentDescription="Zoom Out"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
+        android:padding="10dp"
+        android:background="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
-        android:layout_toRightOf="@id/map_type"
+        android:layout_toEndOf="@id/map_type"
         android:src="@drawable/zoom_out_map"
-        />
+        android:layout_toRightOf="@id/map_type" />
 
     <ImageButton
         android:id="@+id/settingsbtn"
+        android:contentDescription="Settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/transparent"
+        android:padding="10dp"
+        android:background="@android:color/transparent"
         android:layout_alignBottom="@id/separator_adview"
         android:src="@drawable/settings_icon"
+        android:layout_toEndOf="@id/zoom_out"
         android:layout_toRightOf="@id/zoom_out"
         />
 
@@ -95,8 +100,9 @@
         android:layout_above="@id/separator_toggles"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:textColor="@color/lcdbg"
-        android:textSize="25sp"
+        android:textSize="30sp"
         android:text="~~~~~"
         />
 
@@ -105,10 +111,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/odometerbg"
+        android:layout_alignStart="@id/odometerbg"
         android:layout_alignTop="@id/odometerbg"
         android:layout_alignRight="@id/odometerbg"
-        android:gravity="right"
-        android:textSize="25sp"
+        android:layout_alignEnd="@id/odometerbg"
+        android:gravity="end"
+        android:textSize="30sp"
         android:text="-----"
         />
 
@@ -118,8 +126,10 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/odometerbg"
         android:layout_toRightOf="@id/odometerbg"
+        android:layout_toEndOf="@id/odometerbg"
         android:layout_marginLeft="15dp"
-        android:textSize="15sp"
+        android:layout_marginStart="15dp"
+        android:textSize="20sp"
         android:textColor="@color/lcdbg"
         android:text="~~"
         />
@@ -129,21 +139,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/odometerunitsbg"
+        android:layout_alignStart="@id/odometerunitsbg"
         android:layout_alignTop="@id/odometerunitsbg"
-        android:textSize="15sp"
+        android:textSize="20sp"
         android:text="km"
         />
 
     <Button
         android:id="@+id/reset_btn"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:textColor="@color/pitchBlack"
-        android:layout_marginBottom="0dp"
+        android:contentDescription="Reset"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
         android:layout_alignBottom="@id/separator_toggles"
         android:padding="0dp"
+        android:textColor="@color/pitchBlack"
         android:background="@drawable/reset_button"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:text="RESET"
         />
 
@@ -162,10 +174,10 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/odometerbg"
         android:layout_marginBottom="30dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:textColor="@color/lcdbg"
-        android:textSize="15sp"
+        android:textSize="25sp"
         android:text="~~~~~"
         />
 
@@ -174,9 +186,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/speedounitsbg"
+        android:layout_alignStart="@id/speedounitsbg"
         android:layout_alignRight="@id/speedounitsbg"
+        android:layout_alignEnd="@id/speedounitsbg"
         android:layout_alignTop="@id/speedounitsbg"
-        android:textSize="15sp"
+        android:textSize="25sp"
         android:text="km/hr"
         />
 
@@ -185,9 +199,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/speedounitsbg"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_centerHorizontal="true"
-        android:textSize="50sp"
+        android:textSize="70sp"
         android:text="~~~~"
         android:textColor="@color/lcdbg"
         />
@@ -198,10 +212,12 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/speedobg"
         android:layout_alignRight="@id/speedobg"
+        android:layout_alignEnd="@id/speedobg"
         android:layout_alignLeft="@id/speedobg"
-        android:gravity="right"
+        android:layout_alignStart="@id/speedobg"
+        android:gravity="end"
         android:singleLine="true"
-        android:textSize="50sp"
+        android:textSize="70sp"
         android:text="----"
         />
 
@@ -220,9 +236,10 @@
         android:textColor="@color/pureWhite"
         android:layout_above="@id/separator_speedo"
         android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:textSize="15sp"
-        android:text="Pos : (00.00, 00.00)"
+        android:text="Position : (00.00, 00.00)"
         />
 
 
@@ -241,7 +258,9 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toRightOf="@id/position"
-        android:layout_marginLeft="5dp"
+        android:layout_toEndOf="@id/position"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:background="@color/pureWhite"/>
 
     <TextView
@@ -251,8 +270,9 @@
         android:textColor="@color/pureWhite"
         android:layout_alignBaseline="@id/position"
         android:layout_toRightOf="@id/divider_pos_alt"
+        android:layout_toEndOf="@id/divider_pos_alt"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
         android:textSize="15sp"
         android:text="Alt : 0 m"
         />
@@ -264,6 +284,9 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toRightOf="@id/altitude"
+        android:layout_toEndOf="@id/altitude"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:background="@color/pureWhite"/>
 
     <TextView
@@ -273,23 +296,27 @@
         android:textColor="@color/pureWhite"
         android:layout_alignBaseline="@id/position"
         android:layout_toRightOf="@id/divider_alt_dir"
+        android:layout_toEndOf="@id/divider_alt_dir"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:textSize="15sp"
         android:text="Dir : NA"
         />
 
-
     <ImageButton
         android:id="@+id/more_info"
+        android:contentDescription="More Info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="35dp"
         android:padding="0dp"
-        android:backgroundTint="@android:color/transparent"
+        android:background="@android:color/transparent"
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:src="@drawable/info_box"
         />
 
@@ -300,7 +327,9 @@
         android:layout_alignTop="@id/separator_lat_long"
         android:layout_alignBottom="@id/separator_speedo"
         android:layout_toLeftOf="@id/more_info"
+        android:layout_toStartOf="@id/more_info"
         android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:background="@color/pureWhite"/>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

@@ -5,133 +5,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/include"
+        layout="@layout/scroll_section_1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.6"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="247dp" />
-
-    <com.quintlr.speedometer.Fonts.ValuesTextView
-        android:id="@+id/speedobg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="60sp"
-        android:text="~~~~"
-        android:maxLines="1"
-        android:textColor="@color/lcdbg"
-        app:layout_constraintTop_toTopOf="@+id/horizontal_guideline"
-        android:layout_marginTop="8dp"
         android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/guideline2"
-        android:layout_marginRight="8dp" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
 
-    <com.quintlr.speedometer.Fonts.ValuesTextView
-        android:id="@+id/speedo"
+    <include
+        layout="@layout/scroll_section_2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textSize="60sp"
-        android:gravity="right"
-        android:text="123.4"
-        app:layout_constraintLeft_toLeftOf="@id/speedobg"
-        app:layout_constraintTop_toTopOf="@+id/speedobg" />
-
-    <com.quintlr.speedometer.Fonts.UnitsTextView
-        android:id="@+id/speedounitsbg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="~~~~~"
-        android:textColor="@color/lcdbg"
-        android:textSize="18sp"
-        android:maxLines="1"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/guideline2"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/speedobg" />
-
-    <com.quintlr.speedometer.Fonts.UnitsTextView
-        android:id="@+id/speedounits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="km/hr"
-        android:maxLines="1"
-        android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="@id/speedounitsbg"
-        app:layout_constraintLeft_toLeftOf="@id/speedounitsbg"/>
-
-    <com.quintlr.speedometer.Fonts.ValuesTextView
-        android:id="@+id/odobg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="~~~~~"
-        android:textColor="@color/lcdbg"
-        android:textSize="30sp"
-        android:maxLines="1"
-        app:layout_constraintTop_toTopOf="@+id/speedobg"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent" />
-
-    <com.quintlr.speedometer.Fonts.ValuesTextView
-        android:id="@+id/odo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="123.45"
-        android:textSize="30sp"
-        android:maxLines="1"
-        app:layout_constraintLeft_toLeftOf="@id/odobg"
-        app:layout_constraintTop_toTopOf="@id/odobg"/>
-
-    <com.quintlr.speedometer.Fonts.UnitsTextView
-        android:id="@+id/odounitsbg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="~~"
-        android:textColor="@color/lcdbg"
-        android:maxLines="1"
-        android:textSize="15sp"
-        app:layout_constraintLeft_toRightOf="@id/guideline2"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/odobg"
-        android:layout_marginTop="8dp"
-        app:layout_constraintHorizontal_bias="0.5" />
-
-    <com.quintlr.speedometer.Fonts.UnitsTextView
-        android:id="@+id/odounits"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="km"
-        android:textSize="15sp"
-        android:maxLines="1"
-        app:layout_constraintTop_toTopOf="@id/odounitsbg"
-        app:layout_constraintLeft_toLeftOf="@id/odounitsbg" />
-
-    <View
-        android:id="@+id/speedo_sep_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="2dp"
-        android:background="@color/pureWhite"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/speedounitsbg"
-        android:layout_marginTop="8dp" />
-
-    <Button
-        android:id="@+id/reset"
-        android:layout_width="0dp"
-        android:layout_height="25dp"
-        android:text="Reset"
-        android:textColor="@color/pitchBlack"
-        android:background="@drawable/reset_button"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
-        app:layout_constraintBottom_toTopOf="@+id/speedo_sep_horizontal" />
+        app:layout_constraintTop_toBottomOf="@+id/include" />
 
 </android.support.constraint.ConstraintLayout>

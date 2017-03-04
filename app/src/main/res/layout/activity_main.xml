@@ -54,10 +54,20 @@
         app:layout_constraintTop_toTopOf="@+id/horizontal_guideline"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/adView">
+        app:layout_constraintBottom_toTopOf="@+id/bot_con">
 
         <include layout="@layout/scroll_content"/>
 
     </ScrollView>
+
+    <include
+        android:id="@+id/bot_con"
+        layout="@layout/bottom_controls"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
+        android:layout_marginBottom="8dp" />
 
 </android.support.constraint.ConstraintLayout>

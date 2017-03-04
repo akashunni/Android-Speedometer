@@ -5,24 +5,22 @@
         <item>Miles/Hr</item>
         <item>Mtr/Sec</item>
     </string-array>
-
-    <string-array name="speedo_units_values">
+    <integer-array name="speedo_units_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
-    </string-array>
+    </integer-array>
 
     <string-array name="odo_units_list">
         <item>Kilometers</item>
         <item>Miles</item>
         <item>Meters</item>
     </string-array>
-
-    <string-array name="odo_units_values">
+    <integer-array name="odo_units_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
-    </string-array>
+    </integer-array>
 
     <string-array name="map_style_names">
         <item>Standard</item>

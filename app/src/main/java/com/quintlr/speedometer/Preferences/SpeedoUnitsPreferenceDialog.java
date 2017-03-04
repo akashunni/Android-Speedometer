@@ -10,39 +10,38 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import com.quintlr.speedometer.Activities.MainActivity;
 import com.quintlr.speedometer.R;
 
 /**
- * Created by akash on 4/3/17.
+ * Created by akash on 5/3/17.
  */
 
-public class MapStylePreferenceDialog extends DialogFragment{
-    private String[] mapStyleNames;
+public class SpeedoUnitsPreferenceDialog extends DialogFragment {
+    private String[] speedoUnits;
     private int selectedValue;
-    private SharedPreferences mapStylePreference;
-    private MapStyleClickListener mapStyleClickListener;
+    private SharedPreferences speedoUnitsPreference;
+    private SpeedoUnitClickListener speedoUnitClickListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mapStylePreference = PreferenceManager.getDefaultSharedPreferences(getContext());
-        mapStyleNames = getResources().getStringArray(R.array.map_style_names);
-        selectedValue = mapStylePreference.getInt("mapStyle", 0);
+        speedoUnitsPreference = PreferenceManager.getDefaultSharedPreferences(getContext());
+        speedoUnits = getResources().getStringArray(R.array.speedo_units_list);
+        selectedValue = speedoUnitsPreference.getInt("speedoUnits", 0);
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        dialog.setTitle("Select Map Style");
+        dialog.setTitle("Select speedometer units");
         dialog.setPositiveButton(null, null);
-        dialog.setSingleChoiceItems(mapStyleNames, selectedValue, itemClickListener);
+        dialog.setSingleChoiceItems(speedoUnits, selectedValue, itemClickListener);
         return dialog.create();
     }
 
-    public void setOnClickListener(MapStyleClickListener mapStyleClickListener){
-        this.mapStyleClickListener = mapStyleClickListener;
+    public void setOnClickListener(SpeedoUnitClickListener speedoUnitClickListener){
+        this.speedoUnitClickListener = speedoUnitClickListener;
     }
 
     DialogInterface.OnClickListener itemClickListener = new DialogInterface.OnClickListener() {
@@ -50,14 +49,15 @@ public class MapStylePreferenceDialog extends DialogFragment{
         public void onClick(DialogInterface dialog, int which) {
             if (selectedValue != which){
                 selectedValue = which;
-                mapStylePreference.edit().putInt("mapStyle", selectedValue).apply();
-                mapStyleClickListener.onMapStyleClickListener();
+                speedoUnitsPreference.edit().putInt("speedoUnits", selectedValue).apply();
+                speedoUnitClickListener.onSpeedoUnitClickListener();
             }
             dialog.dismiss();
         }
     };
 
-    public interface MapStyleClickListener{
-        void onMapStyleClickListener();
+    public interface SpeedoUnitClickListener{
+        void onSpeedoUnitClickListener();
     }
+
 }

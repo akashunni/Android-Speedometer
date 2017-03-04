@@ -27,9 +27,12 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -54,14 +57,14 @@
         app:layout_constraintTop_toTopOf="@+id/horizontal_guideline"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bot_con">
+        app:layout_constraintBottom_toTopOf="@+id/bottom">
 
         <include layout="@layout/scroll_content"/>
 
     </ScrollView>
 
     <include
-        android:id="@+id/bot_con"
+        android:id="@+id/bottom"
         layout="@layout/bottom_controls"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -22,4 +22,5 @@ public class SharedPrefs {
         return sharedPreferences.getBoolean("firstTime", true);
     }
 
+
 }

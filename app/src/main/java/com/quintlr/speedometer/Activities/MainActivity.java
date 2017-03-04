@@ -24,11 +24,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.AppCompatImageView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -52,10 +54,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quintlr.speedometer.Fonts.UnitsTextView;
 import com.quintlr.speedometer.Fonts.ValuesTextView;
-import com.quintlr.speedometer.Preferences.Preferences;
+import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
 import com.quintlr.speedometer.R;
 import com.quintlr.speedometer.Preferences.SharedPrefs;
 
@@ -65,13 +68,16 @@ import java.util.List;
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback{
+        OnMapReadyCallback,
+        View.OnClickListener,
+        MapStylePreferenceDialog.MapStyleClickListener{
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
     private TextView latitude, longitude, altitude, direction;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
+    private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_mapStyle, btn_settings;
     Location lastLocation;
     private boolean showLastLocation = true;
     String TAG  = "test";
@@ -89,6 +95,18 @@ public class MainActivity extends FragmentActivity implements
         longitude = (TextView) findViewById(R.id.longitude);
         altitude = (TextView) findViewById(R.id.altitude);
         direction = (TextView) findViewById(R.id.direction);
+        btn_currLoc = (AppCompatImageView) findViewById(R.id.currLoc);
+        btn_search = (AppCompatImageView) findViewById(R.id.search);
+        btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
+        btn_mapStyle = (AppCompatImageView) findViewById(R.id.mapStyle);
+        btn_settings = (AppCompatImageView) findViewById(R.id.settings);
+
+        //Setting onClickListeners to buttons
+        btn_currLoc.setOnClickListener(this);
+        btn_search.setOnClickListener(this);
+        btn_mapType.setOnClickListener(this);
+        btn_mapStyle.setOnClickListener(this);
+        btn_settings.setOnClickListener(this);
 
         //attach fragment map with this activity.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
@@ -112,7 +130,72 @@ public class MainActivity extends FragmentActivity implements
                 .build());
     }
 
+    // onClick listener for buttons
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.currLoc:
 
+                break;
+            case R.id.search:
+
+                break;
+            case R.id.mapType:
+                if (googleMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
+                    DrawableCompat.setTint(btn_mapType.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                } else {
+                    DrawableCompat.setTint(btn_mapType.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
+                break;
+            case R.id.mapStyle:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                MapStylePreferenceDialog mapStylePreferenceDialog = new MapStylePreferenceDialog();
+                mapStylePreferenceDialog.show(fragmentManager, "mapStyle");
+                mapStylePreferenceDialog.setOnClickListener(this);
+                break;
+            case R.id.settings:
+
+                break;
+        }
+    }
+
+    void setMapStyle(){
+        //Setting the map style
+        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("mapStyle", 0)){
+            //Standard
+            case 0:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_standard));
+                break;
+            //Silver
+            case 1:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_silver));
+                break;
+            //Retro
+            case 2:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_retro));
+                break;
+            //Dark
+            case 3:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_dark));
+                break;
+            //Night
+            case 4:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_night));
+                break;
+            //Aubergune
+            case 5:
+                googleMap.setMapStyle(MapStyleOptions
+                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_aubergine));
+                break;
+        }
+    }
 
     @Override
     protected void onStart() {
@@ -178,6 +261,11 @@ public class MainActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map is ready...");
         this.googleMap = googleMap;
+        setMapStyle();
     }
 
+    @Override
+    public void onMapStyleClickListener() {
+        setMapStyle();
+    }
 }

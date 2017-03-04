@@ -73,6 +73,7 @@ public class MainActivity extends FragmentActivity implements
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     Location lastLocation;
+    private boolean showLastLocation = true;
     String TAG  = "test";
 
     @Override
@@ -89,9 +90,11 @@ public class MainActivity extends FragmentActivity implements
         altitude = (TextView) findViewById(R.id.altitude);
         direction = (TextView) findViewById(R.id.direction);
 
+        //attach fragment map with this activity.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
         mapFragment.getMapAsync(this);
 
+        //create googleAPIClient for last location.
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addConnectionCallbacks(this)
@@ -100,6 +103,13 @@ public class MainActivity extends FragmentActivity implements
                     .build();
         }
 
+        //show ad in adView
+        MobileAds.initialize(getApplicationContext(), getResources().getString(R.string.banner_ad_unit_id));
+        AdView adView = (AdView) findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("54CEFC489DFC20BF0748DB522ED99F07") //OP3T
+                .build());
     }
 
 
@@ -136,16 +146,19 @@ public class MainActivity extends FragmentActivity implements
         }
         // getting & setting the lastLocation.
         Log.d(TAG, "LocationServices API connected...");
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        if (lastLocation != null){
-            Log.d(TAG, "Got the Last Location...");
-            latitude.setText(String.valueOf(lastLocation.getLatitude()));
-            longitude.setText(String.valueOf(lastLocation.getLongitude()));
-            CameraUpdate cameraUpdate = CameraUpdateFactory
-                    .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
-            googleMap.animateCamera(cameraUpdate);
-        }else {
-            Log.d(TAG, "Last Location is NULL");
+        if (showLastLocation){
+            showLastLocation = false;
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (lastLocation != null){
+                Log.d(TAG, "Got the Last Location...");
+                latitude.setText(String.valueOf(lastLocation.getLatitude()));
+                longitude.setText(String.valueOf(lastLocation.getLongitude()));
+                CameraUpdate cameraUpdate = CameraUpdateFactory
+                        .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
+                googleMap.animateCamera(cameraUpdate);
+            }else {
+                Log.d(TAG, "Last Location is NULL");
+            }
         }
     }
 

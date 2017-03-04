@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:text="21'2596&quot;"
+        android:text="123456"
         app:layout_constraintLeft_toLeftOf="@+id/vertical_mid_guideline"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@+id/lat_textView" />
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:text="18'1516&quot;"
+        android:text="123456"
         app:layout_constraintBaseline_toBaselineOf="@+id/lon_textView"
         app:layout_constraintLeft_toLeftOf="@+id/vertical_mid_guideline"
         app:layout_constraintRight_toRightOf="parent" />

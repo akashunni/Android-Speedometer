@@ -1,28 +1,54 @@
 package com.quintlr.speedometer.Activities;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,6 +63,8 @@ import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.quintlr.speedometer.R;
 
+import java.util.ArrayList;
+
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -44,7 +72,9 @@ public class MainActivity extends FragmentActivity implements
         View.OnClickListener,
         MapStylePreferenceDialog.MapStyleClickListener,
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
-        OdoUnitsPreferenceDialog.OdoUnitClickListener{
+        OdoUnitsPreferenceDialog.OdoUnitClickListener,
+        android.location.LocationListener,
+        SensorEventListener{
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
@@ -53,8 +83,12 @@ public class MainActivity extends FragmentActivity implements
     private GoogleMap googleMap;
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_mapStyle, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
+    public static final int LOCATION_PERMISSION_ID = 9999;
+    public static final int SMS_PERMISSION_ID = 8888, REQUEST_CHECK_SETTINGS = 777;
     Location lastLocation;
-    private boolean showLastLocation = true;
+    private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
+    private LocationManager locationManager;
+    double distance = 0, lat_value=0, long_value=0;
     String TAG  = "test";
 
     @Override
@@ -76,6 +110,7 @@ public class MainActivity extends FragmentActivity implements
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
         btn_mapStyle = (AppCompatImageView) findViewById(R.id.mapStyle);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //Setting onClickListeners to buttons
         btn_currLoc.setOnClickListener(this);
@@ -118,7 +153,8 @@ public class MainActivity extends FragmentActivity implements
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.currLoc:
-
+                currentLocationPressed = !currentLocationPressed;
+                trackCurrentLocation(true);
                 break;
             case R.id.search:
 
@@ -231,9 +267,226 @@ public class MainActivity extends FragmentActivity implements
         googleApiClient.disconnect();
     }
 
+    boolean isGPSEnabled(){
+        if (((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            GPSisOn();
+            return true;
+        }
+        return false;
+    }
+
+    public void enableGPS() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest)
+                .setAlwaysShow(true);
+
+        PendingResult<LocationSettingsResult> pendingResult =
+                LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+
+        pendingResult.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                switch (result.getStatus().getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        Log.d(TAG, "onResult: success");
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        Log.d(TAG, "onResult: res_req");
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            result.getStatus().startResolutionForResult(
+                                    MainActivity.this,
+                                    REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                }
+            }
+        });
+
+    }
+
+    void GPSisOn(){
+        if (checkLocationPermission()){
+            Log.d(TAG, "GPSisOn: ");
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            // enable GPS result
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.d(TAG, "GPS Turned ON...");
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.d(TAG, "GPS Request cancelled...");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    void trackCurrentLocation(boolean zoom){
+        if (checkLocationPermission()) {
+            googleMap.setMyLocationEnabled(true);
+            if (currentLocationPressed) {
+                DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                if (isGPSEnabled()) {
+                    LatLng latLng = null;
+                    if (got_location) {
+                        latLng = new LatLng(lat_value, long_value);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Satellite signals, try outdoors", Toast.LENGTH_SHORT).show();
+                    }
+                    if (latLng != null) {
+                        CameraUpdate cameraUpdate;
+                        if (zoom)
+                            cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+                        else
+                            cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                        googleMap.animateCamera(cameraUpdate);
+                    }
+                } else {
+                    enableGPS();
+                    trackCurrentLocation(zoom);
+                }
+            } else {
+                DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                locationManager.removeUpdates(this);
+            }
+        }else {
+            requestLocationPermission();
+        }
+    }
+
+    // Permissions
+    boolean checkSMSPermission(){
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    void requestSMSPermission(){
+        if (!checkSMSPermission()){
+            /* The permission is NOT already granted.
+             Check if the user has been asked about this permission already and denied
+             it. If so, we want to give more explanation about why the permission is needed.*/
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+                    /* Show our own UI next time when the user denied for the permission*/
+                    // calls when dialog shows after the first denial.
+                    //Log.d("akash", "checkAndGetPermissions: IF->RATIONALE");
+                }
+                /* Fire off an async request to actually get the permission
+                 This will show the standard permission request dialog UI*/
+                requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_ID);
+            }
+        }
+    }
+
+    boolean checkLocationPermission(){
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    void requestLocationPermission(){
+        if (!checkLocationPermission()) {
+            /* The permission is NOT already granted.
+             Check if the user has been asked about this permission already and denied
+             it. If so, we want to give more explanation about why the permission is needed.*/
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    /* Show our own UI next time when the user denied for the permission*/
+                    // calls when dialog shows after the first denial.
+                    //Log.d("akash", "checkAndGetPermissions: IF->RATIONALE");
+                }
+                /* Fire off an async request to actually get the permission
+                 This will show the standard permission request dialog UI*/
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_ID);
+            }
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case LOCATION_PERMISSION_ID:
+                if (grantResults.length==1 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    // if permission is not granted.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)){
+                            // onDenyClick
+
+                        }else {
+                            // don't show again checked and deny clicked.
+                            // called always on start if that option was checked.
+                            permissionUI();
+                        }
+                    }
+                }else {
+                    // allow clicked.
+                    // called always on start if that option was clicked.
+                    // write the funcs here from where permission was requested.
+                    if (currentLocationPressed){
+                        trackCurrentLocation(true);
+                    }
+
+                }
+                break;
+
+            case SMS_PERMISSION_ID:
+                break;
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void permissionUI(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Permission to access the songs from your device was denied. You cannot see the content or play any music unless the permission is GRANTED. Would you like to do it now?")
+                .setCancelable(false)
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                        Toast.makeText(MainActivity.this, "Click on PERMISSIONS & grant access to Storage & RESTART THE APP.", Toast.LENGTH_LONG).show();
+                        //open app settings.
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                        ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.constaintLayoutMain);
+                        Snackbar.make(constraintLayout, "Cannot retrieve songs.", Snackbar.LENGTH_LONG)
+                                .setAction("RETRY", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        // on clicking Retry
+                                        permissionUI();
+                                    }
+                                })
+                                .show();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     //Google API's part
@@ -283,6 +536,8 @@ public class MainActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map is ready...");
         this.googleMap = googleMap;
+        googleMap.setTrafficEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         setMapStyle();
     }
 
@@ -302,5 +557,47 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onOdoUnitClickListener() {
         setOdoUnits();
+    }
+
+
+    // Sensor changed listener
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    // Location listener
+    @Override
+    public void onLocationChanged(Location location) {
+        lat_value = location.getLatitude();
+        long_value = location.getLongitude();
+        latitude.setText(String.valueOf(lat_value));
+        longitude.setText(String.valueOf(long_value));
+        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
+        altitude.setText(String.valueOf(location.getAltitude()));
+        got_location = true;
+        if (currentLocationPressed){
+            trackCurrentLocation(false);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

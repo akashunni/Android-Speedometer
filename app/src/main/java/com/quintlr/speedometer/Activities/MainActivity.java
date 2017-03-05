@@ -154,6 +154,7 @@ public class MainActivity extends FragmentActivity implements
         switch (v.getId()){
             case R.id.currLoc:
                 currentLocationPressed = !currentLocationPressed;
+                Log.d(TAG, "Current Location Pressed = "+currentLocationPressed);
                 trackCurrentLocation(true);
                 break;
             case R.id.search:
@@ -259,12 +260,14 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
+        isGPSEnabled();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         googleApiClient.disconnect();
+        locationManager.removeUpdates(this);
     }
 
     boolean isGPSEnabled(){
@@ -275,7 +278,15 @@ public class MainActivity extends FragmentActivity implements
         return false;
     }
 
+    void GPSisOn(){
+        if (checkLocationPermission()){
+            Log.d(TAG, "GPSisOn: requestLocationUpdates");
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+    }
+
     public void enableGPS() {
+        Log.d(TAG, "enableGPS: ");
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(30 * 1000);
@@ -293,10 +304,10 @@ public class MainActivity extends FragmentActivity implements
             public void onResult(LocationSettingsResult result) {
                 switch (result.getStatus().getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
-                        Log.d(TAG, "onResult: success");
+                        Log.d(TAG, "onResult: SUCCESS");
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Log.d(TAG, "onResult: res_req");
+                        Log.d(TAG, "onResult: RESOLUTION REQUIRED");
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
@@ -313,13 +324,6 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
-    void GPSisOn(){
-        if (checkLocationPermission()){
-            Log.d(TAG, "GPSisOn: ");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -328,6 +332,7 @@ public class MainActivity extends FragmentActivity implements
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.d(TAG, "GPS Turned ON...");
+                        trackCurrentLocation(true);
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.d(TAG, "GPS Request cancelled...");
@@ -341,11 +346,12 @@ public class MainActivity extends FragmentActivity implements
     }
 
     void trackCurrentLocation(boolean zoom){
+        Log.d(TAG, "trackCurrentLocation: ");
         if (checkLocationPermission()) {
             googleMap.setMyLocationEnabled(true);
             if (currentLocationPressed) {
-                DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
                 if (isGPSEnabled()) {
+                    DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
                     LatLng latLng = null;
                     if (got_location) {
                         latLng = new LatLng(lat_value, long_value);
@@ -362,10 +368,10 @@ public class MainActivity extends FragmentActivity implements
                     }
                 } else {
                     enableGPS();
-                    trackCurrentLocation(zoom);
                 }
             } else {
                 DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                Log.d(TAG, "removing updates for location manager...");
                 locationManager.removeUpdates(this);
             }
         }else {
@@ -393,6 +399,13 @@ public class MainActivity extends FragmentActivity implements
                  This will show the standard permission request dialog UI*/
                 requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_ID);
             }
+        }
+    }
+
+    void gotLocationPermission(){
+        if (currentLocationPressed){
+            Log.d(TAG, "CALLING trackCurrentLocation from gotLocationPermission");
+            trackCurrentLocation(true);
         }
     }
 
@@ -438,9 +451,7 @@ public class MainActivity extends FragmentActivity implements
                     // allow clicked.
                     // called always on start if that option was clicked.
                     // write the funcs here from where permission was requested.
-                    if (currentLocationPressed){
-                        trackCurrentLocation(true);
-                    }
+                    gotLocationPermission();
 
                 }
                 break;
@@ -492,30 +503,22 @@ public class MainActivity extends FragmentActivity implements
     //Google API's part
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         // getting & setting the lastLocation.
         Log.d(TAG, "LocationServices API connected...");
-        if (showLastLocation){
-            showLastLocation = false;
-            lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (lastLocation != null){
-                Log.d(TAG, "Got the Last Location...");
-                latitude.setText(String.valueOf(lastLocation.getLatitude()));
-                longitude.setText(String.valueOf(lastLocation.getLongitude()));
-                CameraUpdate cameraUpdate = CameraUpdateFactory
-                        .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
-                googleMap.animateCamera(cameraUpdate);
-            }else {
-                Log.d(TAG, "Last Location is NULL");
+        if (checkLocationPermission()){
+            if (showLastLocation){
+                showLastLocation = false;
+                lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                if (lastLocation != null){
+                    Log.d(TAG, "Got the Last Location...");
+                    latitude.setText(String.valueOf(lastLocation.getLatitude()));
+                    longitude.setText(String.valueOf(lastLocation.getLongitude()));
+                    CameraUpdate cameraUpdate = CameraUpdateFactory
+                            .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
+                    googleMap.animateCamera(cameraUpdate);
+                }else {
+                    Log.d(TAG, "Last Location is NULL");
+                }
             }
         }
     }

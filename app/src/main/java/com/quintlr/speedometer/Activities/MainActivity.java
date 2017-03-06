@@ -21,11 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
@@ -41,13 +39,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,8 +57,6 @@ import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
 import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.quintlr.speedometer.R;
-
-import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -85,6 +78,8 @@ public class MainActivity extends FragmentActivity implements
     private FragmentManager fragmentManager = getSupportFragmentManager();
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int SMS_PERMISSION_ID = 8888, REQUEST_CHECK_SETTINGS = 777;
+    private int speedRefresh = 0, distanceRefresh = 0;
+    private Location prevLocation = null;
     Location lastLocation;
     private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
@@ -144,8 +139,39 @@ public class MainActivity extends FragmentActivity implements
                 .addTestDevice("54CEFC489DFC20BF0748DB522ED99F07") //OP3T
                 .build());
 
+        // setting speedo & odo units
         setSpeedoUnits();
         setOdoUnits();
+    }
+
+    public void permissionForSpeedUI(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("To calculate SPEED, you need to enable Location. Click YES to enable Location, NO to continue using the app without Location.")
+                .setCancelable(false)
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        requestLocationPermission();
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                        ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.constaintLayoutMain);
+                        Snackbar.make(constraintLayout, "Cannot retrieve speed.", Snackbar.LENGTH_LONG)
+                                .setAction("RETRY", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        // on clicking Retry
+                                        permissionForSpeedUI();
+                                    }
+                                })
+                                .show();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     // onClick listener for buttons
@@ -260,27 +286,35 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
-        isGPSEnabled();
+        if (!checkLocationPermission()){
+            permissionForSpeedUI();
+        }else {
+            requestLocationUpdates();
+        }
+        if(!isGPSEnabled()){
+            Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         googleApiClient.disconnect();
+        Log.d(TAG, "--- REMOVING LOCATION UPDATES ---");
         locationManager.removeUpdates(this);
     }
 
     boolean isGPSEnabled(){
         if (((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            GPSisOn();
+            requestLocationUpdates();
             return true;
         }
         return false;
     }
 
-    void GPSisOn(){
+    void requestLocationUpdates(){
         if (checkLocationPermission()){
-            Log.d(TAG, "GPSisOn: requestLocationUpdates");
+            Log.d(TAG, "+++ REQUESTING LOCATION UPDATES +++");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
     }
@@ -289,8 +323,9 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "enableGPS: ");
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(30 * 1000);
-        locationRequest.setFastestInterval(5 * 1000);
+        locationRequest.setInterval(60 * 1000);
+        locationRequest.setFastestInterval(30 * 1000);
+        locationRequest.setSmallestDisplacement(1);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest)
@@ -332,7 +367,10 @@ public class MainActivity extends FragmentActivity implements
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.d(TAG, "GPS Turned ON...");
-                        trackCurrentLocation(true);
+                        requestLocationUpdates();
+                        if (currentLocationPressed){
+                            trackCurrentLocation(true);
+                        }
                         break;
                     case Activity.RESULT_CANCELED:
                         Log.d(TAG, "GPS Request cancelled...");
@@ -371,8 +409,6 @@ public class MainActivity extends FragmentActivity implements
                 }
             } else {
                 DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
-                Log.d(TAG, "removing updates for location manager...");
-                locationManager.removeUpdates(this);
             }
         }else {
             requestLocationPermission();
@@ -406,6 +442,8 @@ public class MainActivity extends FragmentActivity implements
         if (currentLocationPressed){
             Log.d(TAG, "CALLING trackCurrentLocation from gotLocationPermission");
             trackCurrentLocation(true);
+        }else if(!isGPSEnabled()){
+            enableGPS();
         }
     }
 
@@ -576,17 +614,74 @@ public class MainActivity extends FragmentActivity implements
 
     // Location listener
     @Override
-    public void onLocationChanged(Location location) {
-        lat_value = location.getLatitude();
-        long_value = location.getLongitude();
+    public void onLocationChanged(Location currentLocation) {
+        lat_value = currentLocation.getLatitude();
+        long_value = currentLocation.getLongitude();
         latitude.setText(String.valueOf(lat_value));
         longitude.setText(String.valueOf(long_value));
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
-        altitude.setText(String.valueOf(location.getAltitude()));
+        altitude.setText(String.valueOf(currentLocation.getAltitude()));
         got_location = true;
+
         if (currentLocationPressed){
             trackCurrentLocation(false);
         }
+
+        if (currentLocation.hasSpeed()) {
+            speedRefresh = 0;
+            double speed = 0;
+            switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0)){
+                case 0:
+                    speed = currentLocation.getSpeed()*(18/5);
+                    break;
+                case 1:
+                    speed = currentLocation.getSpeed()*2.2369;
+                    break;
+                case 2:
+                    speed = currentLocation.getSpeed();
+                    break;
+            }
+            ///// check for overspeed /////
+            if (speed <= 999.9)
+                speedo.setText(String.format("%3.01f", speed));
+            else
+                speedo.setText("high");
+            //////
+        } else {
+            speedRefresh++;
+            if(speedRefresh>=3)
+                speedo.setText("----");
+        }
+
+        if (prevLocation != null) {
+            if (distanceRefresh == 7) {
+                Location new_old_location = prevLocation;
+                distance += currentLocation.distanceTo(new_old_location);
+                distanceRefresh = 0;
+                double display_distance=0;
+                switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0)){
+                    case 0:
+                        display_distance = distance/1000;
+                        break;
+                    case 1:
+                        display_distance = distance/1609.344;
+                        break;
+                    case 2:
+                        display_distance = distance;
+                        break;
+                }
+                if (display_distance <= 999.99){
+                    odo.setText(String.format("%4.02f", display_distance));
+                    //sharedPrefs_distance.changePrefs(distance);
+                }
+                else {
+                    distance = 0;
+                }
+            }
+            distanceRefresh++;
+        }
+        prevLocation = currentLocation;
+
     }
 
     @Override
@@ -596,11 +691,12 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onProviderEnabled(String provider) {
-
+        Log.d(TAG, "onProviderEnabled: ");
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        Log.d(TAG, "onProviderDisabled: ");
+        Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
     }
 }

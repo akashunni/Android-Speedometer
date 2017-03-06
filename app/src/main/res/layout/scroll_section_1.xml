@@ -34,9 +34,10 @@
         android:maxLines="1"
         android:textSize="60sp"
         android:gravity="right"
-        android:text="123.4"
+        android:text="----"
         app:layout_constraintLeft_toLeftOf="@id/speedobg"
-        app:layout_constraintTop_toTopOf="@+id/speedobg" />
+        app:layout_constraintTop_toTopOf="@+id/speedobg"
+        app:layout_constraintRight_toRightOf="@id/speedobg"/>
 
     <com.quintlr.speedometer.Fonts.UnitsTextView
         android:id="@+id/speedounitsbg"
@@ -79,13 +80,15 @@
 
     <com.quintlr.speedometer.Fonts.ValuesTextView
         android:id="@+id/odo"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="123.45"
+        android:text="-----"
+        android:gravity="right"
         android:textSize="30sp"
         android:maxLines="1"
         app:layout_constraintLeft_toLeftOf="@id/odobg"
-        app:layout_constraintTop_toTopOf="@id/odobg"/>
+        app:layout_constraintTop_toTopOf="@id/odobg"
+        app:layout_constraintRight_toRightOf="@id/odobg"/>
 
     <com.quintlr.speedometer.Fonts.UnitsTextView
         android:id="@+id/odounitsbg"

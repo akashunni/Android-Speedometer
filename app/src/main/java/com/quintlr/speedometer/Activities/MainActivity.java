@@ -2,15 +2,18 @@ package com.quintlr.speedometer.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
@@ -21,13 +24,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.transition.Fade;
+import android.support.transition.Transition;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,11 +47,17 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,18 +80,21 @@ public class MainActivity extends FragmentActivity implements
         MapStylePreferenceDialog.MapStyleClickListener,
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
-        android.location.LocationListener,
-        SensorEventListener{
+        LocationListener,
+        SensorEventListener, PlaceSelectionListener {
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
     private TextView latitude, longitude, altitude, direction;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
+    private PlaceAutocompleteFragment searchFragment;
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_mapStyle, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int SMS_PERMISSION_ID = 8888, REQUEST_CHECK_SETTINGS = 777;
+    public static final float SMALLEST_DISPLACEMENT = 0.5f;
+    public static final long UPDATE_INTERVAL = 500;
     private int speedRefresh = 0, distanceRefresh = 0;
     private Location prevLocation = null;
     Location lastLocation;
@@ -122,12 +139,20 @@ public class MainActivity extends FragmentActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
         mapFragment.getMapAsync(this);
 
-        //create googleAPIClient for last location.
+        //attach search fragment with this activity.
+        searchFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.search_fragment);
+        android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.hide(searchFragment);
+        fragmentTransaction.commit();
+        searchFragment.setOnPlaceSelectedListener(this);
+
+        //create googleAPIClient.
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
+                    .addApi(Places.GEO_DATA_API)
                     .build();
         }
 
@@ -184,7 +209,15 @@ public class MainActivity extends FragmentActivity implements
                 trackCurrentLocation(true);
                 break;
             case R.id.search:
-
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                if (searchFragment.isHidden()){
+                    fragmentTransaction.show(searchFragment);
+                    DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                }else {
+                    fragmentTransaction.hide(searchFragment);
+                    DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                }
+                fragmentTransaction.commit();
                 break;
             case R.id.mapType:
                 if (googleMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
@@ -315,7 +348,7 @@ public class MainActivity extends FragmentActivity implements
     void requestLocationUpdates(){
         if (checkLocationPermission()){
             Log.d(TAG, "+++ REQUESTING LOCATION UPDATES +++");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
         }
     }
 
@@ -325,7 +358,7 @@ public class MainActivity extends FragmentActivity implements
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(60 * 1000);
         locationRequest.setFastestInterval(30 * 1000);
-        locationRequest.setSmallestDisplacement(1);
+        locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest)
@@ -698,5 +731,16 @@ public class MainActivity extends FragmentActivity implements
     public void onProviderDisabled(String provider) {
         Log.d(TAG, "onProviderDisabled: ");
         Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
+    }
+
+    // for search fragment.
+    @Override
+    public void onPlaceSelected(Place place) {
+
+    }
+
+    @Override
+    public void onError(Status status) {
+
     }
 }

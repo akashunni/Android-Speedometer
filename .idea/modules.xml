@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Speedometer.iml" filepath="$PROJECT_DIR$/Speedometer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Android-Speedometer.iml" filepath="$PROJECT_DIR$/Android-Speedometer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

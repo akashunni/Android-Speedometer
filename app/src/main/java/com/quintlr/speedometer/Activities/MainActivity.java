@@ -161,7 +161,7 @@ public class MainActivity extends FragmentActivity implements
         AdView adView = (AdView) findViewById(R.id.adView);
         adView.loadAd(new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("54CEFC489DFC20BF0748DB522ED99F07") //OP3T
+                .addTestDevice("E7A76C31163F0B32B56A88C78F40E833") //OP3T
                 .build());
 
         // setting speedo & odo units
@@ -657,7 +657,7 @@ public class MainActivity extends FragmentActivity implements
         got_location = true;
 
         if (currentLocationPressed){
-            trackCurrentLocation(false);
+            trackCurrentLocation(true);
         }
 
         if (currentLocation.hasSpeed()) {
@@ -736,7 +736,7 @@ public class MainActivity extends FragmentActivity implements
     // for search fragment.
     @Override
     public void onPlaceSelected(Place place) {
-
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(place.getViewport(), 50));
     }
 
     @Override

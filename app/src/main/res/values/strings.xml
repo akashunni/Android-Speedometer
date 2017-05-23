@@ -15,4 +15,21 @@ Initially developed by Android, Inc., which Google bought in 2005,[16] Android w
 
 Android's source code is released by Google under open source licenses, although most Android devices ultimately ship with a combination of open source and proprietary software, including proprietary software required for accessing Google services.[3] Android is popular with technology companies that require a ready-made, low-cost and customizable operating system for high-tech devices.[24] At the same time, as Android has no centralised update system most Android devices fail to receive security updates: research in 2015, concluded that almost 90% of Android phones in use had known but unpatched security vulnerabilities due to lack of updates and support.[25][26] Its open nature has encouraged a large community of developers and enthusiasts to use the open-source code as a foundation for community-driven projects, which deliver updates to older devices, add new features for advanced users[27] or bring Android to devices originally shipped with other operating systems. The success of Android has made it a target for patent (and copyright) litigation as part of the so-called between technology companies"
     </string>
+    <string name="not_available">"N/A"</string>
+    <string name="tilde_2">"~~"</string>
+    <string name="tilde_4">"~~~~"</string>
+    <string name="tilde_5">"~~~~~"</string>
+    <string name="hyphen_4">"----"</string>
+    <string name="hyphen_5">"-----"</string>
+    <string name="reset">"Reset"</string>
+    <string name="km">"km"</string>
+    <string name="mi">"mi"</string>
+    <string name="mt">"mt"</string>
+    <string name="km_hr">"km/hr"</string>
+    <string name="mi_hr">"mi/hr"</string>
+    <string name="mt_sec">"mt/sc"</string>
+    <string name="latitude">"Latitude"</string>
+    <string name="longitude">"Longitude</string>
+    <string name="altitude">"Altitude (above MSL)"</string>
+    <string name="direction">"Direction"</string>
 </resources>

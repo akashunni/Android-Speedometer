@@ -26,7 +26,7 @@ public class Instructions extends AppCompatActivity {
         asyncActivityLoader.execute();
     }
 
-    class AsyncActivityLoader extends AsyncTask<String, String, Intent>{
+    private class AsyncActivityLoader extends AsyncTask<String, Void, Intent>{
         Context context;
         AsyncActivityLoader(Context context){
             this.context = context;

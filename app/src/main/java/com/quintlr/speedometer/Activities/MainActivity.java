@@ -37,6 +37,7 @@ import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -653,7 +654,7 @@ public class MainActivity extends FragmentActivity implements
         latitude.setText(String.valueOf(lat_value));
         longitude.setText(String.valueOf(long_value));
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
-        altitude.setText(String.valueOf(currentLocation.getAltitude()));
+        altitude.setText(String.valueOf(currentLocation.getAltitude()).concat(" mt."));
         got_location = true;
 
         if (currentLocationPressed){

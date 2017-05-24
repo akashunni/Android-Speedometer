@@ -22,4 +22,16 @@ public class SharedPrefs {
         return sharedPreferences.getBoolean("firstTime", true);
     }
 
+    public static void setDistance(Context context, float distance){
+        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat("distance", distance);
+        editor.apply();
+    }
+
+    public static float getDistance(Context context){
+        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getFloat("distance", 0);
+    }
+
 }

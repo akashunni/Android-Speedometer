@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -40,6 +41,7 @@ import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,14 +78,18 @@ import com.quintlr.speedometer.Fonts.UnitsTextView;
 import com.quintlr.speedometer.Fonts.ValuesTextView;
 import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
 import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
+import com.quintlr.speedometer.Preferences.SharedPrefs;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.quintlr.speedometer.R;
+import com.quintlr.speedometer.Utilities.OdoValues;
+import com.quintlr.speedometer.Utilities.SpeedoValues;
 
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         OnMapReadyCallback,
         View.OnClickListener,
+        View.OnLongClickListener,
         MapStylePreferenceDialog.MapStyleClickListener,
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
@@ -93,6 +99,7 @@ public class MainActivity extends FragmentActivity implements
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
+    private Button resetBtn;
     private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
@@ -108,7 +115,9 @@ public class MainActivity extends FragmentActivity implements
     Location lastLocation;
     private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
-    double distance = 0, lat_value = 0, long_value = 0;
+    float speed = 0,
+            distance = 0, alt_value = 0, acc_value = 0, degrees = 0, display_distance = 0;
+    double lat_value = 0, long_value = 0;
     String TAG = "test";
 
     @Override
@@ -121,6 +130,7 @@ public class MainActivity extends FragmentActivity implements
         odo = (ValuesTextView) findViewById(R.id.odo);
         speedoUnits = (UnitsTextView) findViewById(R.id.speedounits);
         odoUnits = (UnitsTextView) findViewById(R.id.odounits);
+        resetBtn = (Button) findViewById(R.id.reset);
         latitude = (TextView) findViewById(R.id.latitude);
         longitude = (TextView) findViewById(R.id.longitude);
         altitude = (TextView) findViewById(R.id.altitude);
@@ -143,6 +153,8 @@ public class MainActivity extends FragmentActivity implements
         speedoUnits.setOnClickListener(this);
         odo.setOnClickListener(this);
         odoUnits.setOnClickListener(this);
+        resetBtn.setOnClickListener(this);
+        resetBtn.setOnLongClickListener(this);
 
         //attach fragment map with this activity.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
@@ -173,9 +185,70 @@ public class MainActivity extends FragmentActivity implements
                 .addTestDevice("E7A76C31163F0B32B56A88C78F40E833") //OP3T
                 .build());
 
+        //assigning distance value
+        distance = SharedPrefs.getDistance(getApplicationContext());
+
         // setting speedo & odo units
         setSpeedoUnits();
         setOdoUnits();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("showLastLocation", showLastLocation);
+        outState.putBoolean("currentLocationPressed", currentLocationPressed);
+        outState.putBoolean("got_location", got_location);
+        outState.putFloat("speed", speed);
+        outState.putFloat("distance", distance);
+        outState.putFloat("display_distance", display_distance);
+        outState.putDouble("lat_value", lat_value);
+        outState.putDouble("long_value", long_value);
+        outState.putFloat("alt_value", alt_value);
+        outState.putFloat("acc_value", acc_value);
+        outState.putFloat("degrees", degrees);
+        Log.d(TAG, "onSaveInstanceState: "+lat_value+"::"+long_value);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        showLastLocation = savedInstanceState.getBoolean("showLastLocation");
+        currentLocationPressed = savedInstanceState.getBoolean("currentLocationPressed");
+        got_location = savedInstanceState.getBoolean("got_location");
+        speed = savedInstanceState.getFloat("speed");
+        distance = savedInstanceState.getFloat("distance");
+        display_distance = savedInstanceState.getFloat("display_distance");
+        lat_value = savedInstanceState.getDouble("lat_value");
+        long_value = savedInstanceState.getDouble("long_value");
+        alt_value = savedInstanceState.getFloat("alt_value");
+        acc_value = savedInstanceState.getFloat("acc_value");
+        degrees = savedInstanceState.getFloat("degrees");
+        if (currentLocationPressed){
+            DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+        }else {
+            DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+        }
+        if (speed <= 999.9)
+            speedo.setText(String.format("%3.01f", speed));
+        else
+            speedo.setText("high");
+        if (display_distance <= 999.99)
+            odo.setText(String.format("%4.02f", display_distance));
+        else
+            odo.setText(String.format("%4.02f", 0));
+        latitude.setText(String.valueOf(lat_value));
+        longitude.setText(String.valueOf(long_value));
+        if (alt_value != 0) {
+            altitude.setText(String.valueOf(alt_value).concat(" mts."));
+        }
+        if (acc_value != 0) {
+            accuracy.setText(String.valueOf(Character.toString((char) 177) + " " + acc_value + " mts."));
+        }
+        if (degrees != 0) {
+            direction.setText(String.valueOf(degreesToDirection(degrees)+" ("+degrees+(char)176+")"));
+        }
+        Log.d(TAG, "onRestoreInstanceState: "+lat_value+"::"+long_value);
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void permissionForSpeedUI() {
@@ -257,6 +330,22 @@ public class MainActivity extends FragmentActivity implements
                 odoUnitsPreferenceDialog.show(fragmentManager, "odoUnits");
                 odoUnitsPreferenceDialog.setOnClickListener(this);
                 break;
+            case R.id.reset:
+                Toast.makeText(this, "Long Press the button to RESET.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.reset:
+                distance = 0;
+                SharedPrefs.setDistance(getApplicationContext(), 0);
+                setOdoValues();
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -308,6 +397,23 @@ public class MainActivity extends FragmentActivity implements
                 speedoUnits.setText("mt/sc");
                 break;
         }
+        if (got_location){
+            setSpeedoValues();
+        }
+    }
+
+    void setSpeedoValues(){
+        if (speed == -1){
+            if (speedRefresh >= 3){
+                speedo.setText(R.string.hyphen_4);
+                speedRefresh = 0;
+            }
+        }else if (speed > 999.99){
+            speedo.setText("high");
+        }else {
+            speedo.setText(String.format("%3.01f", speed));
+            speedRefresh = 0;
+        }
     }
 
     void setOdoUnits() {
@@ -322,6 +428,56 @@ public class MainActivity extends FragmentActivity implements
                 odoUnits.setText("mt");
                 break;
         }
+        if (distance != 0){
+            setOdoValues();
+        }
+    }
+
+    void setOdoValues(){
+        display_distance = OdoValues.getDisplayDistance(distance,
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0));
+        if (display_distance <= 999.99){
+            odo.setText(String.format("%4.02f", display_distance));
+        }else {
+            distance = 0;
+        }
+    }
+    
+    String degreesToDirection(double degrees){
+        if (degrees >= 348.75 && degrees <= 360 || degrees >= 0 && degrees < 11.25){
+            return "N";
+        }else if (degrees >= 11.25 && degrees < 33.75){
+            return "NNE";
+        }else if (degrees >= 33.75 && degrees < 56.25){
+            return "NE";
+        }else if (degrees >= 56.25 && degrees < 78.75){
+            return "ENE";
+        }else if (degrees >= 78.75 && degrees < 101.25){
+            return "E";
+        }else if (degrees >= 101.25 && degrees < 123.75){
+            return "ESE";
+        }else if (degrees >= 123.75 && degrees < 146.25){
+            return "SE";
+        }else if (degrees >= 146.25 && degrees < 168.75){
+            return "SSE";
+        }else if (degrees >= 168.75 && degrees < 191.25){
+            return "S";
+        }else if (degrees >= 191.25 && degrees < 213.75){
+            return "SSW";
+        }else if (degrees >= 213.75 && degrees < 236.25){
+            return "SW";
+        }else if (degrees >= 236.25 && degrees < 258.75){
+            return "WSW";
+        }else if (degrees >= 258.75 && degrees < 281.25){
+            return "W";
+        }else if (degrees >= 281.25 && degrees < 303.75){
+            return "WNW";
+        }else if (degrees >= 303.75 && degrees < 326.25){
+            return "NW";
+        }else if (degrees >= 326.25 && degrees < 348.75){
+            return "NNW";
+        }
+        return getResources().getString(R.string.not_available);
     }
 
     @Override
@@ -569,8 +725,10 @@ public class MainActivity extends FragmentActivity implements
                 lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
                 if (lastLocation != null) {
                     Log.d(TAG, "Got the Last Location...");
-                    latitude.setText(String.valueOf(lastLocation.getLatitude()));
-                    longitude.setText(String.valueOf(lastLocation.getLongitude()));
+                    lat_value = lastLocation.getLatitude();
+                    long_value = lastLocation.getLongitude();
+                    latitude.setText(String.valueOf(lat_value));
+                    longitude.setText(String.valueOf(long_value));
                     CameraUpdate cameraUpdate = CameraUpdateFactory
                             .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
                     googleMap.animateCamera(cameraUpdate);
@@ -620,7 +778,6 @@ public class MainActivity extends FragmentActivity implements
         setOdoUnits();
     }
 
-
     // Sensor changed listener
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -646,19 +803,23 @@ public class MainActivity extends FragmentActivity implements
         longitude.setText(String.valueOf(long_value));
         // setting altitude value
         if (currentLocation.hasAltitude()){
-            altitude.setText(String.valueOf(currentLocation.getAltitude()).concat(" mts."));
+            alt_value = (float) currentLocation.getAltitude();
+            altitude.setText(String.valueOf(alt_value).concat(" mts."));
         }else {
             altitude.setText(R.string.not_available);
         }
         // setting direction value
         if (currentLocation.hasBearing()){
-            direction.setText(String.valueOf(currentLocation.getBearing()));
+            degrees = currentLocation.getBearing();
+            direction.setText(String.valueOf(degreesToDirection(degrees)+" ("+degrees+(char)176+")"));
         }else {
             direction.setText(R.string.not_available);
         }
+
         // setting accuracy value
         if (currentLocation.hasAccuracy()){
-            accuracy.setText(String.valueOf(currentLocation.getAccuracy() + " mts."));
+            acc_value = currentLocation.getAccuracy();
+            accuracy.setText(String.valueOf(Character.toString((char)177)+" "+acc_value+" mts."));
         }else {
             accuracy.setText(R.string.not_available);
         }
@@ -667,59 +828,30 @@ public class MainActivity extends FragmentActivity implements
             trackCurrentLocation(true);
         }
 
-        if (currentLocation.hasSpeed()) {
-            speedRefresh = 0;
-            double speed = 0;
-            switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0)){
-                case 0:
-                    speed = currentLocation.getSpeed()*(18/5);
-                    break;
-                case 1:
-                    speed = currentLocation.getSpeed()*2.2369;
-                    break;
-                case 2:
-                    speed = currentLocation.getSpeed();
-                    break;
-            }
-            ///// check for overspeed /////
-            if (speed <= 999.9)
-                speedo.setText(String.format("%3.01f", speed));
-            else
-                speedo.setText("high");
-            //////
-        } else {
+        //////////////////////////////////////////////////
+        // The Speed thing...
+        speed = SpeedoValues.getDisplaySpeed(currentLocation,
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0));
+        // updating the speed refresh value per location change!
+        if (speed == -1) {
             speedRefresh++;
-            if(speedRefresh>=3)
-                speedo.setText(R.string.hyphen_4);
         }
+        // setting the corresponding speed value in UI
+        setSpeedoValues();
 
-        if (prevLocation != null) {
-            if (distanceRefresh == 7) {
-                Location new_old_location = prevLocation;
-                distance += currentLocation.distanceTo(new_old_location);
-                distanceRefresh = 0;
-                double display_distance=0;
-                switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0)){
-                    case 0:
-                        display_distance = distance/1000;
-                        break;
-                    case 1:
-                        display_distance = distance/1609.344;
-                        break;
-                    case 2:
-                        display_distance = distance;
-                        break;
-                }
-                if (display_distance <= 999.99){
-                    odo.setText(String.format("%4.02f", display_distance));
-                    //sharedPrefs_distance.changePrefs(distance);
-                }
-                else {
-                    distance = 0;
-                }
-            }
+        //////////////////////////////////////////////////
+        // The distance thing...
+        if (distanceRefresh == 7){
+            distanceRefresh = 0;
+            distance += OdoValues.getDistance(prevLocation, currentLocation);
+            // saving distance in shared preferences.
+            SharedPrefs.setDistance(getApplicationContext(), distance);
+            // sets the odo values in UI
+            setOdoValues();
+        } else {
             distanceRefresh++;
         }
+
         prevLocation = currentLocation;
     }
 

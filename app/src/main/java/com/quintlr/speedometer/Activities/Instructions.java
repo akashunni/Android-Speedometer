@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.quintlr.speedometer.Preferences.SharedPrefs;
 import com.quintlr.speedometer.R;
 
 public class Instructions extends AppCompatActivity {
@@ -45,6 +46,7 @@ public class Instructions extends AppCompatActivity {
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    SharedPrefs.setFirstTime(getApplicationContext());
                     startActivity(s);
                     finish();
                 }

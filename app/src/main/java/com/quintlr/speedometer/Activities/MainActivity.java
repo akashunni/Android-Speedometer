@@ -9,9 +9,11 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,6 +28,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.transition.Fade;
 import android.support.transition.Transition;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -66,6 +69,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
+import com.quintlr.speedometer.BuildConfig;
 import com.quintlr.speedometer.Fonts.UnitsTextView;
 import com.quintlr.speedometer.Fonts.ValuesTextView;
 import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
@@ -82,11 +88,12 @@ public class MainActivity extends FragmentActivity implements
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
         LocationListener,
-        SensorEventListener, PlaceSelectionListener {
+        SensorEventListener,
+        PlaceSelectionListener {
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
-    private TextView latitude, longitude, altitude, direction;
+    private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private PlaceAutocompleteFragment searchFragment;
@@ -101,8 +108,8 @@ public class MainActivity extends FragmentActivity implements
     Location lastLocation;
     private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
-    double distance = 0, lat_value=0, long_value=0;
-    String TAG  = "test";
+    double distance = 0, lat_value = 0, long_value = 0;
+    String TAG = "test";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,6 +125,7 @@ public class MainActivity extends FragmentActivity implements
         longitude = (TextView) findViewById(R.id.longitude);
         altitude = (TextView) findViewById(R.id.altitude);
         direction = (TextView) findViewById(R.id.direction);
+        accuracy = (TextView) findViewById(R.id.accuracy);
         btn_currLoc = (AppCompatImageView) findViewById(R.id.currLoc);
         btn_search = (AppCompatImageView) findViewById(R.id.search);
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
@@ -170,7 +178,7 @@ public class MainActivity extends FragmentActivity implements
         setOdoUnits();
     }
 
-    public void permissionForSpeedUI(){
+    public void permissionForSpeedUI() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("To calculate SPEED, you need to enable Location. Click YES to enable Location, NO to continue using the app without Location.")
                 .setCancelable(false)
@@ -203,18 +211,18 @@ public class MainActivity extends FragmentActivity implements
     // onClick listener for buttons
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.currLoc:
                 currentLocationPressed = !currentLocationPressed;
-                Log.d(TAG, "Current Location Pressed = "+currentLocationPressed);
+                Log.d(TAG, "Current Location Pressed = " + currentLocationPressed);
                 trackCurrentLocation(true);
                 break;
             case R.id.search:
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                if (searchFragment.isHidden()){
+                if (searchFragment.isHidden()) {
                     fragmentTransaction.show(searchFragment);
                     DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
-                }else {
+                } else {
                     fragmentTransaction.hide(searchFragment);
                     DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
                 }
@@ -252,44 +260,44 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    void setMapStyle(){
+    void setMapStyle() {
         //Setting the map style
-        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("mapStyle", 0)){
+        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("mapStyle", 0)) {
             //Standard
             case 0:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_standard));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_standard));
                 break;
             //Silver
             case 1:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_silver));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_silver));
                 break;
             //Retro
             case 2:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_retro));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_retro));
                 break;
             //Dark
             case 3:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_dark));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_dark));
                 break;
             //Night
             case 4:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_night));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_night));
                 break;
             //Aubergune
             case 5:
                 googleMap.setMapStyle(MapStyleOptions
-                        .loadRawResourceStyle(getApplicationContext(),R.raw.map_style_aubergine));
+                        .loadRawResourceStyle(getApplicationContext(), R.raw.map_style_aubergine));
                 break;
         }
     }
 
-    void setSpeedoUnits(){
-        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0)){
+    void setSpeedoUnits() {
+        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0)) {
             case 0:
                 speedoUnits.setText("km/hr");
                 break;
@@ -302,8 +310,8 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    void setOdoUnits(){
-        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0)){
+    void setOdoUnits() {
+        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0)) {
             case 0:
                 odoUnits.setText("km");
                 break;
@@ -320,12 +328,12 @@ public class MainActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
-        if (!checkLocationPermission()){
+        if (!checkLocationPermission()) {
             permissionForSpeedUI();
-        }else {
+        } else {
             requestLocationUpdates();
         }
-        if(!isGPSEnabled()){
+        if (!isGPSEnabled()) {
             Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
         }
     }
@@ -338,16 +346,16 @@ public class MainActivity extends FragmentActivity implements
         locationManager.removeUpdates(this);
     }
 
-    boolean isGPSEnabled(){
-        if (((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)){
+    boolean isGPSEnabled() {
+        if (((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             requestLocationUpdates();
             return true;
         }
         return false;
     }
 
-    void requestLocationUpdates(){
-        if (checkLocationPermission()){
+    void requestLocationUpdates() {
+        if (checkLocationPermission()) {
             Log.d(TAG, "+++ REQUESTING LOCATION UPDATES +++");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
         }
@@ -402,7 +410,7 @@ public class MainActivity extends FragmentActivity implements
                     case Activity.RESULT_OK:
                         Log.d(TAG, "GPS Turned ON...");
                         requestLocationUpdates();
-                        if (currentLocationPressed){
+                        if (currentLocationPressed) {
                             trackCurrentLocation(true);
                         }
                         break;
@@ -417,7 +425,7 @@ public class MainActivity extends FragmentActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    void trackCurrentLocation(boolean zoom){
+    void trackCurrentLocation(boolean zoom) {
         Log.d(TAG, "trackCurrentLocation: ");
         if (checkLocationPermission()) {
             googleMap.setMyLocationEnabled(true);
@@ -444,48 +452,26 @@ public class MainActivity extends FragmentActivity implements
             } else {
                 DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
             }
-        }else {
+        } else {
             requestLocationPermission();
         }
     }
 
     // Permissions
-    boolean checkSMSPermission(){
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    void requestSMSPermission(){
-        if (!checkSMSPermission()){
-            /* The permission is NOT already granted.
-             Check if the user has been asked about this permission already and denied
-             it. If so, we want to give more explanation about why the permission is needed.*/
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
-                    /* Show our own UI next time when the user denied for the permission*/
-                    // calls when dialog shows after the first denial.
-                    //Log.d("akash", "checkAndGetPermissions: IF->RATIONALE");
-                }
-                /* Fire off an async request to actually get the permission
-                 This will show the standard permission request dialog UI*/
-                requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_ID);
-            }
-        }
-    }
-
-    void gotLocationPermission(){
-        if (currentLocationPressed){
+    void gotLocationPermission() {
+        if (currentLocationPressed) {
             Log.d(TAG, "CALLING trackCurrentLocation from gotLocationPermission");
             trackCurrentLocation(true);
-        }else if(!isGPSEnabled()){
+        } else if (!isGPSEnabled()) {
             enableGPS();
         }
     }
 
-    boolean checkLocationPermission(){
+    boolean checkLocationPermission() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    void requestLocationPermission(){
+    void requestLocationPermission() {
         if (!checkLocationPermission()) {
             /* The permission is NOT already granted.
              Check if the user has been asked about this permission already and denied
@@ -505,21 +491,21 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case LOCATION_PERMISSION_ID:
-                if (grantResults.length==1 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     // if permission is not granted.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)){
+                        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                             // onDenyClick
 
-                        }else {
+                        } else {
                             // don't show again checked and deny clicked.
                             // called always on start if that option was checked.
                             permissionUI();
                         }
                     }
-                }else {
+                } else {
                     // allow clicked.
                     // called always on start if that option was clicked.
                     // write the funcs here from where permission was requested.
@@ -534,7 +520,7 @@ public class MainActivity extends FragmentActivity implements
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void permissionUI(){
+    public void permissionUI() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Permission to access the songs from your device was denied. You cannot see the content or play any music unless the permission is GRANTED. Would you like to do it now?")
                 .setCancelable(false)
@@ -577,18 +563,18 @@ public class MainActivity extends FragmentActivity implements
     public void onConnected(@Nullable Bundle bundle) {
         // getting & setting the lastLocation.
         Log.d(TAG, "LocationServices API connected...");
-        if (checkLocationPermission()){
-            if (showLastLocation){
+        if (checkLocationPermission()) {
+            if (showLastLocation) {
                 showLastLocation = false;
                 lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                if (lastLocation != null){
+                if (lastLocation != null) {
                     Log.d(TAG, "Got the Last Location...");
                     latitude.setText(String.valueOf(lastLocation.getLatitude()));
                     longitude.setText(String.valueOf(lastLocation.getLongitude()));
                     CameraUpdate cameraUpdate = CameraUpdateFactory
                             .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
                     googleMap.animateCamera(cameraUpdate);
-                }else {
+                } else {
                     Log.d(TAG, "Last Location is NULL");
                 }
             }
@@ -651,11 +637,31 @@ public class MainActivity extends FragmentActivity implements
     public void onLocationChanged(Location currentLocation) {
         lat_value = currentLocation.getLatitude();
         long_value = currentLocation.getLongitude();
-        latitude.setText(String.valueOf(lat_value));
-        longitude.setText(String.valueOf(long_value));
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
-        altitude.setText(String.valueOf(currentLocation.getAltitude()).concat(" mt."));
+        // got_location is used in trackCurrentLocation to obtain lat_value & long_value
         got_location = true;
+        // setting latitude value
+        latitude.setText(String.valueOf(lat_value));
+        // setting longitude value
+        longitude.setText(String.valueOf(long_value));
+        // setting altitude value
+        if (currentLocation.hasAltitude()){
+            altitude.setText(String.valueOf(currentLocation.getAltitude()).concat(" mts."));
+        }else {
+            altitude.setText(R.string.not_available);
+        }
+        // setting direction value
+        if (currentLocation.hasBearing()){
+            direction.setText(String.valueOf(currentLocation.getBearing()));
+        }else {
+            direction.setText(R.string.not_available);
+        }
+        // setting accuracy value
+        if (currentLocation.hasAccuracy()){
+            accuracy.setText(String.valueOf(currentLocation.getAccuracy() + " mts."));
+        }else {
+            accuracy.setText(R.string.not_available);
+        }
 
         if (currentLocationPressed){
             trackCurrentLocation(true);
@@ -684,7 +690,7 @@ public class MainActivity extends FragmentActivity implements
         } else {
             speedRefresh++;
             if(speedRefresh>=3)
-                speedo.setText("----");
+                speedo.setText(R.string.hyphen_4);
         }
 
         if (prevLocation != null) {
@@ -715,7 +721,6 @@ public class MainActivity extends FragmentActivity implements
             distanceRefresh++;
         }
         prevLocation = currentLocation;
-
     }
 
     @Override
@@ -737,6 +742,13 @@ public class MainActivity extends FragmentActivity implements
     // for search fragment.
     @Override
     public void onPlaceSelected(Place place) {
+        currentLocationPressed = false;
+        trackCurrentLocation(false);
+        // Removes all markers, polylines, polygons, overlays, etc from the map.
+        googleMap.clear();
+        googleMap.addMarker(new MarkerOptions()
+                .position(place.getLatLng())
+                .title(place.getName().toString()));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(place.getViewport(), 50));
     }
 

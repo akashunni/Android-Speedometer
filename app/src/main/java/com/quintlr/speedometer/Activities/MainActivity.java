@@ -486,9 +486,11 @@ public class MainActivity extends FragmentActivity implements
         locationManager.removeUpdates(this);
     }
 
+
     boolean isLocationEnabled() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            // location enabled
             requestLocationUpdates();
             return true;
         }
@@ -790,15 +792,6 @@ public class MainActivity extends FragmentActivity implements
     // Location listener
     @Override
     public void onLocationChanged(Location currentLocation) {
-
-
-        Log.d(TAG, "PROVIDERS = "+locationManager.getProviders(true));
-
-
-
-
-
-
         lat_value = currentLocation.getLatitude();
         long_value = currentLocation.getLongitude();
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
@@ -881,6 +874,10 @@ public class MainActivity extends FragmentActivity implements
     public void onProviderDisabled(String provider) {
         Log.d(TAG, "onProviderDisabled: ");
         Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
+        // disabling the button.
+        currentLocationPressed = false;
+        // calling this so that the tint of the button is changed.
+        trackCurrentLocation(false);
     }
 
     // for search fragment.

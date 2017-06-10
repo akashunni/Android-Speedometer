@@ -2,8 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.quintlr.speedometer.Fonts.ValuesTextView
         android:id="@+id/speedobg"
@@ -124,15 +123,14 @@
         android:id="@+id/reset"
         android:layout_width="0dp"
         android:layout_height="25dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginRight="0dp"
         android:background="@drawable/reset_button"
         android:text="@string/reset"
         android:textColor="@color/pitchBlack"
         app:layout_constraintBottom_toTopOf="@+id/speedo_sep_horizontal"
-        app:layout_constraintLeft_toRightOf="@+id/odobg"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintLeft_toRightOf="@+id/odounits"
+        android:layout_marginLeft="32dp" />
 
 </android.support.constraint.ConstraintLayout>

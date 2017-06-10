@@ -64,6 +64,14 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activities.AppSettings"
+            android:label="Settings"
+            android:theme="@style/SettingsTheme"
+            android:parentActivityName=".Activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.quintlr.speedometer.Activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

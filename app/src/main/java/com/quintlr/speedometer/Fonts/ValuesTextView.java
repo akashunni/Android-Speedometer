@@ -7,8 +7,6 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import com.quintlr.speedometer.Fonts.FontFactory;
-
 /**
  * Created by Akash on 7/19/2016.
  */

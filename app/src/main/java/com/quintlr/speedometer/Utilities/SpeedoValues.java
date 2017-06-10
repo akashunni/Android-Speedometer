@@ -16,7 +16,7 @@ public class SpeedoValues {
                     return currentLocation.getSpeed() * (18 / 5);
                 // miles/hr
                 case 1:
-                    return (float) (currentLocation.getSpeed() * 2.2369);
+                    return (float) (currentLocation.getSpeed() * 2.23694);
                 // meter/sec
                 case 2:
                     return currentLocation.getSpeed();

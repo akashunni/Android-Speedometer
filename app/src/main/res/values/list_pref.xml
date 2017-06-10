@@ -39,4 +39,15 @@
         <item>5</item>
         <item>6</item>
     </integer-array>
+
+    <string-array name="location_accuracy_names">
+        <item>Balanced Power Accuracy</item>
+        <item>High Accuracy</item>
+        <item>Low Power</item>
+    </string-array>
+    <string-array name="location_accuracy_values">
+        <item>102</item>
+        <item>100</item>
+        <item>104</item>
+    </string-array>
 </resources>

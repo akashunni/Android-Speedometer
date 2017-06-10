@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="Units">
-
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Location">
         <ListPreference
-            android:key="units_speedo"
-            android:title="Speedo Units"
-            android:entries="@array/speedo_units_list"
-            android:entryValues="@array/speedo_units_values"
-            android:defaultValue="1">
-
-        </ListPreference>
-
-        <ListPreference
-            android:key="units_odo"
-            android:title="Odo Units"
-            android:entries="@array/odo_units_list"
-            android:entryValues="@array/odo_units_values"
-            android:defaultValue="1">
-
-        </ListPreference>
-
+            android:title="Power Consumption"
+            android:key="powerConsumption"
+            android:summary="High power gives high accuracy and more battery consumption"
+            android:entries="@array/location_accuracy_names"
+            android:entryValues="@array/location_accuracy_values"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

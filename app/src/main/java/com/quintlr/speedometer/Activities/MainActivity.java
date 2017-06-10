@@ -2,47 +2,35 @@ package com.quintlr.speedometer.Activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
-import android.support.transition.Fade;
-import android.support.transition.Transition;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +51,6 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -72,8 +59,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
-import com.quintlr.speedometer.BuildConfig;
 import com.quintlr.speedometer.Fonts.UnitsTextView;
 import com.quintlr.speedometer.Fonts.ValuesTextView;
 import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
@@ -95,7 +80,7 @@ public class MainActivity extends FragmentActivity implements
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
         LocationListener,
         SensorEventListener,
-        PlaceSelectionListener {
+        PlaceSelectionListener{
 
     private ValuesTextView speedo, odo;
     private UnitsTextView speedoUnits, odoUnits;
@@ -109,7 +94,7 @@ public class MainActivity extends FragmentActivity implements
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int SMS_PERMISSION_ID = 8888, REQUEST_CHECK_SETTINGS = 777;
     public static final float SMALLEST_DISPLACEMENT = 0.5f;
-    public static final long UPDATE_INTERVAL = 500;
+    public static final long UPDATE_INTERVAL = 2*1000;
     private int speedRefresh = 0, distanceRefresh = 0;
     private Location prevLocation = null;
     Location lastLocation;
@@ -228,14 +213,10 @@ public class MainActivity extends FragmentActivity implements
         }else {
             DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
         }
-        if (speed <= 999.9)
-            speedo.setText(String.format("%3.01f", speed));
-        else
-            speedo.setText("high");
-        if (display_distance <= 999.99)
-            odo.setText(String.format("%4.02f", display_distance));
-        else
-            odo.setText(String.format("%4.02f", 0));
+        if (got_location){
+            setSpeedoValues();
+            setOdoValues();
+        }
         latitude.setText(String.valueOf(lat_value));
         longitude.setText(String.valueOf(long_value));
         if (alt_value != 0) {
@@ -316,7 +297,8 @@ public class MainActivity extends FragmentActivity implements
                 mapStylePreferenceDialog.setOnClickListener(this);
                 break;
             case R.id.settings:
-
+                Intent i = new Intent(getApplicationContext(), AppSettings.class);
+                startActivity(i);
                 break;
             case R.id.speedounits:
             case R.id.speedo:
@@ -487,9 +469,9 @@ public class MainActivity extends FragmentActivity implements
         if (!checkLocationPermission()) {
             permissionForSpeedUI();
         } else {
-            requestLocationUpdates();
+            requestGPSLocationUpdates("onStart");
         }
-        if (!isGPSEnabled()) {
+        if (!isLocationEnabled()) {
             Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
         }
     }
@@ -502,17 +484,20 @@ public class MainActivity extends FragmentActivity implements
         locationManager.removeUpdates(this);
     }
 
-    boolean isGPSEnabled() {
-        if (((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            requestLocationUpdates();
+    boolean isLocationEnabled() {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            requestGPSLocationUpdates("isLocationEnabled");
+            Log.d(TAG, "isLocationEnabled: TRUE");
             return true;
         }
+        Log.d(TAG, "isLocationEnabled: False");
         return false;
     }
 
-    void requestLocationUpdates() {
+    void requestGPSLocationUpdates(String from) {
+        Log.d(TAG, "FROM = "+from);
         if (checkLocationPermission()) {
-            Log.d(TAG, "+++ REQUESTING LOCATION UPDATES +++");
+            Log.d(TAG, "+++ REQUESTING GPS LOCATION UPDATES +++");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
         }
     }
@@ -521,7 +506,8 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "enableGPS: ");
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(60 * 1000);
+        //Log.d(TAG, "enableGPS: "+PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "666"));
+        locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(30 * 1000);
         locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);
 
@@ -538,6 +524,7 @@ public class MainActivity extends FragmentActivity implements
                 switch (result.getStatus().getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         Log.d(TAG, "onResult: SUCCESS");
+                        requestGPSLocationUpdates("PENDING RESULT");
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         Log.d(TAG, "onResult: RESOLUTION REQUIRED");
@@ -565,7 +552,7 @@ public class MainActivity extends FragmentActivity implements
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.d(TAG, "GPS Turned ON...");
-                        requestLocationUpdates();
+                        requestGPSLocationUpdates("onActivityResult");
                         if (currentLocationPressed) {
                             trackCurrentLocation(true);
                         }
@@ -586,7 +573,7 @@ public class MainActivity extends FragmentActivity implements
         if (checkLocationPermission()) {
             googleMap.setMyLocationEnabled(true);
             if (currentLocationPressed) {
-                if (isGPSEnabled()) {
+                if (isLocationEnabled()) {
                     DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
                     LatLng latLng = null;
                     if (got_location) {
@@ -618,7 +605,7 @@ public class MainActivity extends FragmentActivity implements
         if (currentLocationPressed) {
             Log.d(TAG, "CALLING trackCurrentLocation from gotLocationPermission");
             trackCurrentLocation(true);
-        } else if (!isGPSEnabled()) {
+        } else if (!isLocationEnabled()) {
             enableGPS();
         }
     }
@@ -841,7 +828,12 @@ public class MainActivity extends FragmentActivity implements
 
         //////////////////////////////////////////////////
         // The distance thing...
-        if (distanceRefresh == 7){
+        distance += OdoValues.getDistance(prevLocation, currentLocation);
+        // saving distance in shared preferences.
+        SharedPrefs.setDistance(getApplicationContext(), distance);
+        // sets the odo values in UI
+        setOdoValues();
+        /*if (distanceRefresh == 7){
             distanceRefresh = 0;
             distance += OdoValues.getDistance(prevLocation, currentLocation);
             // saving distance in shared preferences.
@@ -850,7 +842,7 @@ public class MainActivity extends FragmentActivity implements
             setOdoValues();
         } else {
             distanceRefresh++;
-        }
+        }*/
 
         prevLocation = currentLocation;
     }

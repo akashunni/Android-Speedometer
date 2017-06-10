@@ -1,8 +1,6 @@
 package com.quintlr.speedometer.Utilities;
 
-import android.content.Context;
 import android.location.Location;
-import android.preference.PreferenceManager;
 
 /**
  * Created by akash on 25/5/17.
@@ -28,7 +26,11 @@ public class OdoValues {
     }
 
     public static float getDistance(Location prevLocation, Location currentLocation){
-        return currentLocation.distanceTo(prevLocation);
+        if (prevLocation != null && currentLocation != null){
+            return currentLocation.distanceTo(prevLocation);
+        }else {
+            return 0;
+        }
     }
 
 }

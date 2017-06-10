@@ -30,24 +30,5 @@ public class AppSettings extends PreferenceActivity {
             addPreferencesFromResource(R.xml.preferences);
 
         }
-
-        /*@Override
-        public void onResume() {
-            super.onResume();
-
-        }
-
-        @Override
-        public void onPause() {
-            super.onPause();
-            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals("powerConsumption")){
-                Log.d(TAG, "VAL = ");
-            }
-        }*/
     }
 }

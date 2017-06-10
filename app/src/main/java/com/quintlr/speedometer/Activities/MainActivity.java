@@ -330,6 +330,8 @@ public class MainActivity extends FragmentActivity implements
                 return false;
         }
     }
+    
+    // setting the values
 
     void setMapStyle() {
         //Setting the map style
@@ -467,12 +469,12 @@ public class MainActivity extends FragmentActivity implements
         super.onStart();
         googleApiClient.connect();
         if (!checkLocationPermission()) {
+            // didn't get the permissions
             permissionForSpeedUI();
-        } else {
-            requestGPSLocationUpdates("onStart");
-        }
-        if (!isLocationEnabled()) {
-            Toast.makeText(this, "Enable GPS to calculate SPEED!", Toast.LENGTH_LONG).show();
+        } else if (!isLocationEnabled()) {
+            // we have the permissions and location is disabled.
+            // requesting of location will be done from the isLocationEnabled() [above] method.
+            Toast.makeText(this, "Enable Location to calculate SPEED!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -485,30 +487,39 @@ public class MainActivity extends FragmentActivity implements
     }
 
     boolean isLocationEnabled() {
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            requestGPSLocationUpdates("isLocationEnabled");
-            Log.d(TAG, "isLocationEnabled: TRUE");
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            requestLocationUpdates();
             return true;
         }
+        // Location is disabled.
         Log.d(TAG, "isLocationEnabled: False");
         return false;
     }
 
-    void requestGPSLocationUpdates(String from) {
-        Log.d(TAG, "FROM = "+from);
-        if (checkLocationPermission()) {
-            Log.d(TAG, "+++ REQUESTING GPS LOCATION UPDATES +++");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
+    // Requesting location updates from respective providers.
+    void requestLocationUpdates(){
+        if (checkLocationPermission()){
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                Log.d(TAG, "+++ REQUESTING GPS LOCATION UPDATES +++");
+                // High Accuracy
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                Log.d(TAG, "+++ REQUESTING NETWORK LOCATION UPDATES +++");
+                // Low Accuracy
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        UPDATE_INTERVAL, SMALLEST_DISPLACEMENT, this);
+            }
         }
     }
 
     public void enableGPS() {
         Log.d(TAG, "enableGPS: ");
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        //Log.d(TAG, "enableGPS: "+PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "666"));
+        locationRequest.setPriority(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "102")));
         locationRequest.setInterval(UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(30 * 1000);
+        locationRequest.setFastestInterval(1000);
         locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -524,7 +535,7 @@ public class MainActivity extends FragmentActivity implements
                 switch (result.getStatus().getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
                         Log.d(TAG, "onResult: SUCCESS");
-                        requestGPSLocationUpdates("PENDING RESULT");
+                        requestLocationUpdates();
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         Log.d(TAG, "onResult: RESOLUTION REQUIRED");
@@ -552,7 +563,7 @@ public class MainActivity extends FragmentActivity implements
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.d(TAG, "GPS Turned ON...");
-                        requestGPSLocationUpdates("onActivityResult");
+                        requestLocationUpdates();
                         if (currentLocationPressed) {
                             trackCurrentLocation(true);
                         }
@@ -779,6 +790,15 @@ public class MainActivity extends FragmentActivity implements
     // Location listener
     @Override
     public void onLocationChanged(Location currentLocation) {
+
+
+        Log.d(TAG, "PROVIDERS = "+locationManager.getProviders(true));
+
+
+
+
+
+
         lat_value = currentLocation.getLatitude();
         long_value = currentLocation.getLongitude();
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);

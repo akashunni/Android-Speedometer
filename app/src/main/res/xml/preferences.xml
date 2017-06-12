@@ -8,6 +8,17 @@
             android:summary="High power gives high accuracy and more battery consumption"
             android:entries="@array/location_accuracy_names"
             android:entryValues="@array/location_accuracy_values"
+            android:defaultValue="100"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Map">
+        <ListPreference
+            android:title="Map Style"
+            android:key="mapStyle"
+            android:entries="@array/map_style_names"
+            android:entryValues="@array/map_style_values"
+            android:defaultValue="0"
             />
     </PreferenceCategory>
 </PreferenceScreen>

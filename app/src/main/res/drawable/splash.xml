@@ -8,6 +8,6 @@
         android:gravity="center">
         <bitmap
             android:gravity="center"
-            android:src="@drawable/resize"/>
+            android:src="@drawable/icon"/>
     </item>
 </layer-list>

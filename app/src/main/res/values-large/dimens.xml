@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- for large devices -->
+<resources>
+    <dimen name="scroll_section_2_font_size">19sp</dimen>
+    <dimen name="speedo_font_size">70sp</dimen>
+    <dimen name="speedo_units_font_size">22sp</dimen>
+    <dimen name="odo_font_size">37sp</dimen>
+    <dimen name="odo_units_font_size">20sp</dimen>
+    <dimen name="reset_btn_font">18sp</dimen>
+</resources>

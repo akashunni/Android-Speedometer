@@ -61,7 +61,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quintlr.speedometer.Fonts.UnitsTextView;
 import com.quintlr.speedometer.Fonts.ValuesTextView;
-import com.quintlr.speedometer.Preferences.MapStylePreferenceDialog;
 import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
 import com.quintlr.speedometer.Preferences.SharedPrefs;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
@@ -75,7 +74,7 @@ public class MainActivity extends FragmentActivity implements
         OnMapReadyCallback,
         View.OnClickListener,
         View.OnLongClickListener,
-        MapStylePreferenceDialog.MapStyleClickListener,
+        AppSettings.AppSettingsFragment.MapStyleChangeListener,
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
         LocationListener,
@@ -92,7 +91,7 @@ public class MainActivity extends FragmentActivity implements
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_mapStyle, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
     public static final int LOCATION_PERMISSION_ID = 9999;
-    public static final int SMS_PERMISSION_ID = 8888, REQUEST_CHECK_SETTINGS = 777;
+    public static final int REQUEST_CHECK_SETTINGS = 777;
     public static final float SMALLEST_DISPLACEMENT = 0.5f;
     public static final long UPDATE_INTERVAL = 2*1000;
     private int speedRefresh = 0, distanceRefresh = 0;
@@ -100,8 +99,7 @@ public class MainActivity extends FragmentActivity implements
     Location lastLocation;
     private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
-    float speed = 0,
-            distance = 0, alt_value = 0, acc_value = 0, degrees = 0, display_distance = 0;
+    float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0, display_distance = 0;
     double lat_value = 0, long_value = 0;
     String TAG = "test";
 
@@ -124,7 +122,7 @@ public class MainActivity extends FragmentActivity implements
         btn_currLoc = (AppCompatImageView) findViewById(R.id.currLoc);
         btn_search = (AppCompatImageView) findViewById(R.id.search);
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
-        btn_mapStyle = (AppCompatImageView) findViewById(R.id.mapStyle);
+        btn_mapStyle = (AppCompatImageView) findViewById(R.id.navigation);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -140,6 +138,9 @@ public class MainActivity extends FragmentActivity implements
         odoUnits.setOnClickListener(this);
         resetBtn.setOnClickListener(this);
         resetBtn.setOnLongClickListener(this);
+
+        // setting on map changed listener
+        AppSettings.AppSettingsFragment.setOnMapStyleChangeListener(this);
 
         //attach fragment map with this activity.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
@@ -178,6 +179,7 @@ public class MainActivity extends FragmentActivity implements
         setOdoUnits();
     }
 
+    // save values on rotation
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("showLastLocation", showLastLocation);
@@ -195,6 +197,7 @@ public class MainActivity extends FragmentActivity implements
         super.onSaveInstanceState(outState);
     }
 
+    // restore values after rotation
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         showLastLocation = savedInstanceState.getBoolean("showLastLocation");
@@ -291,10 +294,8 @@ public class MainActivity extends FragmentActivity implements
                     googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 }
                 break;
-            case R.id.mapStyle:
-                MapStylePreferenceDialog mapStylePreferenceDialog = new MapStylePreferenceDialog();
-                mapStylePreferenceDialog.show(fragmentManager, "mapStyle");
-                mapStylePreferenceDialog.setOnClickListener(this);
+            case R.id.navigation:
+
                 break;
             case R.id.settings:
                 Intent i = new Intent(getApplicationContext(), AppSettings.class);
@@ -335,7 +336,7 @@ public class MainActivity extends FragmentActivity implements
 
     void setMapStyle() {
         //Setting the map style
-        switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("mapStyle", 0)) {
+        switch (Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("mapStyle", "0"))) {
             //Standard
             case 0:
                 googleMap.setMapStyle(MapStyleOptions
@@ -426,7 +427,8 @@ public class MainActivity extends FragmentActivity implements
             distance = 0;
         }
     }
-    
+
+    // takes degrees as input and returns the respective direction.
     String degreesToDirection(double degrees){
         if (degrees >= 348.75 && degrees <= 360 || degrees >= 0 && degrees < 11.25){
             return "N";
@@ -464,6 +466,12 @@ public class MainActivity extends FragmentActivity implements
         return getResources().getString(R.string.not_available);
     }
 
+    // setting the map style when changed.
+    @Override
+    public void onMapStyleChanged() {
+        setMapStyle();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -486,7 +494,7 @@ public class MainActivity extends FragmentActivity implements
         locationManager.removeUpdates(this);
     }
 
-
+    // check if location is enabled.
     boolean isLocationEnabled() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
@@ -516,8 +524,9 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    public void enableGPS() {
-        Log.d(TAG, "enableGPS: ");
+    // enabling the Location (dialog shown if not enabled initially)
+    public void enableLocation() {
+        Log.d(TAG, "enableLocation: ");
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "102")));
         locationRequest.setInterval(UPDATE_INTERVAL);
@@ -557,6 +566,7 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
+    // result of enabling the location via dialog from enableLocation() method
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -581,6 +591,7 @@ public class MainActivity extends FragmentActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // this method is executed when current location is pressed.
     void trackCurrentLocation(boolean zoom) {
         Log.d(TAG, "trackCurrentLocation: ");
         if (checkLocationPermission()) {
@@ -603,7 +614,7 @@ public class MainActivity extends FragmentActivity implements
                         googleMap.animateCamera(cameraUpdate);
                     }
                 } else {
-                    enableGPS();
+                    enableLocation();
                 }
             } else {
                 DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
@@ -619,7 +630,7 @@ public class MainActivity extends FragmentActivity implements
             Log.d(TAG, "CALLING trackCurrentLocation from gotLocationPermission");
             trackCurrentLocation(true);
         } else if (!isLocationEnabled()) {
-            enableGPS();
+            enableLocation();
         }
     }
 
@@ -669,9 +680,6 @@ public class MainActivity extends FragmentActivity implements
 
                 }
                 break;
-
-            case SMS_PERMISSION_ID:
-                break;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -714,82 +722,7 @@ public class MainActivity extends FragmentActivity implements
         alert.show();
     }
 
-    //Google API's part
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        // getting & setting the lastLocation.
-        Log.d(TAG, "LocationServices API connected...");
-        if (checkLocationPermission()) {
-            if (showLastLocation) {
-                showLastLocation = false;
-                lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                if (lastLocation != null) {
-                    Log.d(TAG, "Got the Last Location...");
-                    lat_value = lastLocation.getLatitude();
-                    long_value = lastLocation.getLongitude();
-                    latitude.setText(String.valueOf(lat_value));
-                    longitude.setText(String.valueOf(long_value));
-                    CameraUpdate cameraUpdate = CameraUpdateFactory
-                            .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
-                    googleMap.animateCamera(cameraUpdate);
-                } else {
-                    Log.d(TAG, "Last Location is NULL");
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-    // till here
-
-    //Map Ready
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "Map is ready...");
-        this.googleMap = googleMap;
-        googleMap.setTrafficEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        setMapStyle();
-    }
-
-    //MapStyle click listener
-    @Override
-    public void onMapStyleClickListener() {
-        setMapStyle();
-    }
-
-    //Speedo unit click listener
-    @Override
-    public void onSpeedoUnitClickListener() {
-        setSpeedoUnits();
-    }
-
-    //Odo unit click listener
-    @Override
-    public void onOdoUnitClickListener() {
-        setOdoUnits();
-    }
-
-    // Sensor changed listener
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    // Location listener
+    // Location listener - triggers when the location is changed.
     @Override
     public void onLocationChanged(Location currentLocation) {
         lat_value = currentLocation.getLatitude();
@@ -860,16 +793,87 @@ public class MainActivity extends FragmentActivity implements
         prevLocation = currentLocation;
     }
 
+    //Google API's part
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        // getting & setting the lastLocation.
+        Log.d(TAG, "LocationServices API connected...");
+        if (checkLocationPermission()) {
+            if (showLastLocation) {
+                showLastLocation = false;
+                lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                if (lastLocation != null) {
+                    Log.d(TAG, "Got the Last Location...");
+                    lat_value = lastLocation.getLatitude();
+                    long_value = lastLocation.getLongitude();
+                    latitude.setText(String.valueOf(lat_value));
+                    longitude.setText(String.valueOf(long_value));
+                    CameraUpdate cameraUpdate = CameraUpdateFactory
+                            .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
+                    googleMap.animateCamera(cameraUpdate);
+                } else {
+                    Log.d(TAG, "Last Location is NULL");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+    // till here
+
+    //Map Ready
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "Map is ready...");
+        this.googleMap = googleMap;
+        googleMap.setTrafficEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        setMapStyle();
+    }
+
+    //Speedo unit click listener
+    @Override
+    public void onSpeedoUnitClickListener() {
+        setSpeedoUnits();
+    }
+
+    //Odo unit click listener
+    @Override
+    public void onOdoUnitClickListener() {
+        setOdoUnits();
+    }
+
+    // Sensor changed listener
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
     }
 
+    // triggered when location is turned ON.
     @Override
     public void onProviderEnabled(String provider) {
         Log.d(TAG, "onProviderEnabled: ");
     }
 
+    // triggered when location is turned OFF from ON
     @Override
     public void onProviderDisabled(String provider) {
         Log.d(TAG, "onProviderDisabled: ");

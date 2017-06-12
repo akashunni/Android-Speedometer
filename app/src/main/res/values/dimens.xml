@@ -2,4 +2,10 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="scroll_section_2_font_size">16sp</dimen>
+    <dimen name="speedo_font_size">60sp</dimen>
+    <dimen name="speedo_units_font_size">18sp</dimen>
+    <dimen name="odo_font_size">30sp</dimen>
+    <dimen name="odo_units_font_size">15sp</dimen>
+    <dimen name="reset_btn_font">16sp</dimen>
 </resources>

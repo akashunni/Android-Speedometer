@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Location">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="Map">
         <ListPreference
-            android:title="Power Consumption"
-            android:key="powerConsumption"
-            android:summary="High power gives high accuracy and more battery consumption"
-            android:entries="@array/location_accuracy_names"
-            android:entryValues="@array/location_accuracy_values"
-            android:defaultValue="100"
-            />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="Map">
-        <ListPreference
-            android:title="Map Style"
-            android:key="mapStyle"
+            android:defaultValue="0"
             android:entries="@array/map_style_names"
             android:entryValues="@array/map_style_values"
-            android:defaultValue="0"
-            />
+            android:key="mapStyle"
+            android:summary="%s"
+            android:title="Map Style" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Location">
+        <EditTextPreference
+            android:key="speedLimit"
+            android:numeric="decimal"
+            android:summary="Set the speed in displayed units."
+            android:title="Speed Limit" />
+        <ListPreference
+            android:defaultValue="100"
+            android:entries="@array/location_accuracy_names"
+            android:entryValues="@array/location_accuracy_values"
+            android:key="powerConsumption"
+            android:summary="High power gives high accuracy and more battery consumption"
+            android:title="Power Consumption" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Style">
+        <SwitchPreference
+            android:title="Dark Theme"
+            android:key="theme"
+            android:defaultValue="true" />
+        <SwitchPreference
+            android:title="LCD digit backlit"
+            android:key="lcdBacklit"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 </PreferenceScreen>

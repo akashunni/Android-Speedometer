@@ -1,12 +1,22 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="MyAppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="DarkTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/pitchBlack</item>
         <item name="colorPrimaryDark">@color/pitchBlack</item>
         <item name="colorAccent">@color/pureWhite</item>
         <item name="android:textColor">@color/pureWhite</item>
+        <item name="android:windowBackground">@color/pitchBlack</item>
+    </style>
+
+    <style name="LightTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/pitchBlack</item>
+        <item name="colorPrimaryDark">@color/pitchBlack</item>
+        <item name="colorAccent">@color/pureWhite</item>
+        <item name="android:textColor">@color/pitchBlack</item>
+        <item name="android:windowBackground">@color/pureWhite</item>
     </style>
 
     <style name="AlertTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
@@ -19,7 +29,7 @@
         <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
-    <style name="SettingsTheme" parent="MyAppTheme">
+    <style name="SettingsTheme" parent="DarkTheme">
         <item name="android:windowBackground">@color/pitchBlack</item>
     </style>
 

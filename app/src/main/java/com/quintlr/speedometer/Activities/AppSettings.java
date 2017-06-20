@@ -1,16 +1,10 @@
 package com.quintlr.speedometer.Activities;
 
 import android.content.SharedPreferences;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.quintlr.speedometer.R;
 
@@ -25,7 +19,7 @@ public class AppSettings extends PreferenceActivity {
 
     public static class AppSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
         String TAG = "TEST";
-        private static MapStyleChangeListener mapStyleChangeListener;
+        private static AppSettingsChangeListener appSettingsChangeListener;
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -47,16 +41,24 @@ public class AppSettings extends PreferenceActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals("mapStyle")){
-                mapStyleChangeListener.onMapStyleChanged();
+                appSettingsChangeListener.onMapStyleChanged();
+            }
+            if (key.equals("theme")){
+                appSettingsChangeListener.onAppThemeChanged();
+            }
+            if (key.equals("lcdBacklit")){
+                appSettingsChangeListener.onBacklitChanged();
             }
         }
 
-        public static void setOnMapStyleChangeListener(MapStyleChangeListener mapStyleChangeListener){
-            AppSettingsFragment.mapStyleChangeListener = mapStyleChangeListener;
+        public static void setOnMapStyleChangeListener(AppSettingsChangeListener appSettingsChangeListener){
+            AppSettingsFragment.appSettingsChangeListener = appSettingsChangeListener;
         }
 
-        public interface MapStyleChangeListener{
+        public interface AppSettingsChangeListener {
             void onMapStyleChanged();
+            void onAppThemeChanged();
+            void onBacklitChanged();
         }
     }
 }

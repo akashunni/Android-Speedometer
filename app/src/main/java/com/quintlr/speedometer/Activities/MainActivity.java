@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,6 +17,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -65,6 +67,7 @@ import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
 import com.quintlr.speedometer.Preferences.SharedPrefs;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.quintlr.speedometer.R;
+import com.quintlr.speedometer.Utilities.ChangeColor;
 import com.quintlr.speedometer.Utilities.OdoValues;
 import com.quintlr.speedometer.Utilities.SpeedoValues;
 
@@ -74,27 +77,29 @@ public class MainActivity extends FragmentActivity implements
         OnMapReadyCallback,
         View.OnClickListener,
         View.OnLongClickListener,
-        AppSettings.AppSettingsFragment.MapStyleChangeListener,
+        AppSettings.AppSettingsFragment.AppSettingsChangeListener,
         SpeedoUnitsPreferenceDialog.SpeedoUnitClickListener,
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
         LocationListener,
         SensorEventListener,
         PlaceSelectionListener{
 
-    private ValuesTextView speedo, odo;
-    private UnitsTextView speedoUnits, odoUnits;
+    private ValuesTextView speedo, odo, speedobg, odobg;
+    private UnitsTextView speedoUnits, odoUnits, speedoUnitsbg, odoUnitsbg;
     private Button resetBtn;
     private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private PlaceAutocompleteFragment searchFragment;
-    private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_mapStyle, btn_settings;
+    private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_navigation, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int REQUEST_CHECK_SETTINGS = 777;
     public static final float SMALLEST_DISPLACEMENT = 0.5f;
     public static final long UPDATE_INTERVAL = 2*1000;
     private int speedRefresh = 0, distanceRefresh = 0;
+    private Vibrator vibrator;
+    private long vibratePattern []= {0, 600, 1000};
     private Location prevLocation = null;
     Location lastLocation;
     private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
@@ -105,14 +110,18 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setAppTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //Initializing variables
         speedo = (ValuesTextView) findViewById(R.id.speedo);
+        speedobg = (ValuesTextView) findViewById(R.id.speedobg);
         odo = (ValuesTextView) findViewById(R.id.odo);
+        odobg = (ValuesTextView) findViewById(R.id.odobg);
         speedoUnits = (UnitsTextView) findViewById(R.id.speedounits);
+        speedoUnitsbg = (UnitsTextView) findViewById(R.id.speedounitsbg);
         odoUnits = (UnitsTextView) findViewById(R.id.odounits);
+        odoUnitsbg = (UnitsTextView) findViewById(R.id.odounitsbg);
         resetBtn = (Button) findViewById(R.id.reset);
         latitude = (TextView) findViewById(R.id.latitude);
         longitude = (TextView) findViewById(R.id.longitude);
@@ -122,7 +131,7 @@ public class MainActivity extends FragmentActivity implements
         btn_currLoc = (AppCompatImageView) findViewById(R.id.currLoc);
         btn_search = (AppCompatImageView) findViewById(R.id.search);
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
-        btn_mapStyle = (AppCompatImageView) findViewById(R.id.navigation);
+        btn_navigation = (AppCompatImageView) findViewById(R.id.navigation);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -130,7 +139,7 @@ public class MainActivity extends FragmentActivity implements
         btn_currLoc.setOnClickListener(this);
         btn_search.setOnClickListener(this);
         btn_mapType.setOnClickListener(this);
-        btn_mapStyle.setOnClickListener(this);
+        btn_navigation.setOnClickListener(this);
         btn_settings.setOnClickListener(this);
         speedo.setOnClickListener(this);
         speedoUnits.setOnClickListener(this);
@@ -138,6 +147,15 @@ public class MainActivity extends FragmentActivity implements
         odoUnits.setOnClickListener(this);
         resetBtn.setOnClickListener(this);
         resetBtn.setOnLongClickListener(this);
+
+        // Setting color for buttons
+        setButtonsColor();
+
+        // Setting backlit color
+        setBacklitColor();
+
+        // Initialising vibrator
+        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
         // setting on map changed listener
         AppSettings.AppSettingsFragment.setOnMapStyleChangeListener(this);
@@ -212,9 +230,9 @@ public class MainActivity extends FragmentActivity implements
         acc_value = savedInstanceState.getFloat("acc_value");
         degrees = savedInstanceState.getFloat("degrees");
         if (currentLocationPressed){
-            DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+            ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_currLoc);
         }else {
-            DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+            ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_currLoc);
         }
         if (got_location){
             setSpeedoValues();
@@ -278,24 +296,24 @@ public class MainActivity extends FragmentActivity implements
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 if (searchFragment.isHidden()) {
                     fragmentTransaction.show(searchFragment);
-                    DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                    ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_search);
                 } else {
                     fragmentTransaction.hide(searchFragment);
-                    DrawableCompat.setTint(btn_search.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                    ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_search);
                 }
                 fragmentTransaction.commit();
                 break;
             case R.id.mapType:
                 if (googleMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
-                    DrawableCompat.setTint(btn_mapType.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                    ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_mapType);
                     googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                 } else {
-                    DrawableCompat.setTint(btn_mapType.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                    ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_mapType);
                     googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 }
                 break;
             case R.id.navigation:
-
+                Toast.makeText(this, "Coming Soon..!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
                 Intent i = new Intent(getApplicationContext(), AppSettings.class);
@@ -333,6 +351,37 @@ public class MainActivity extends FragmentActivity implements
     }
     
     // setting the values
+
+    void setAppTheme(){
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("theme", true)){
+            setTheme(R.style.DarkTheme);
+        }else {
+            setTheme(R.style.LightTheme);
+        }
+    }
+
+    void setBacklitColor(){
+        // setting lcd backlit properties
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("lcdBacklit", true)){
+            ChangeColor.ofTextView(speedobg, getResources().getColor(R.color.lcdbg));
+            ChangeColor.ofTextView(speedoUnitsbg, getResources().getColor(R.color.lcdbg));
+            ChangeColor.ofTextView(odobg, getResources().getColor(R.color.lcdbg));
+            ChangeColor.ofTextView(odoUnitsbg, getResources().getColor(R.color.lcdbg));
+        }else {
+            ChangeColor.ofTextView(speedobg, getResources().getColor(R.color.transparent));
+            ChangeColor.ofTextView(speedoUnitsbg, getResources().getColor(R.color.transparent));
+            ChangeColor.ofTextView(odobg, getResources().getColor(R.color.transparent));
+            ChangeColor.ofTextView(odoUnitsbg, getResources().getColor(R.color.transparent));
+        }
+    }
+
+    private void setButtonsColor() {
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_currLoc);
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_search);
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_mapType);
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_navigation);
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_settings);
+    }
 
     void setMapStyle() {
         //Setting the map style
@@ -373,13 +422,13 @@ public class MainActivity extends FragmentActivity implements
     void setSpeedoUnits() {
         switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("speedoUnits", 0)) {
             case 0:
-                speedoUnits.setText("km/hr");
+                speedoUnits.setText(R.string.km_hr);
                 break;
             case 1:
-                speedoUnits.setText("mi/hr");
+                speedoUnits.setText(R.string.mi_hr);
                 break;
             case 2:
-                speedoUnits.setText("mt/sc");
+                speedoUnits.setText(R.string.mt_sec);
                 break;
         }
         if (got_location){
@@ -399,18 +448,30 @@ public class MainActivity extends FragmentActivity implements
             speedo.setText(String.format("%3.01f", speed));
             speedRefresh = 0;
         }
+
+        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "0"))){
+            if (vibrator.hasVibrator()){
+                vibrator.vibrate(vibratePattern, 0);
+            }
+            ChangeColor.ofTextView(speedo, getResources().getColor(R.color.red));
+        }else {
+            if (vibrator.hasVibrator()){
+                vibrator.cancel();
+            }
+            ChangeColor.ofTextViewToNormal(getApplicationContext(), speedo);
+        }
     }
 
     void setOdoUnits() {
         switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0)) {
             case 0:
-                odoUnits.setText("km");
+                odoUnits.setText(R.string.km);
                 break;
             case 1:
-                odoUnits.setText("mi");
+                odoUnits.setText(R.string.mi);
                 break;
             case 2:
-                odoUnits.setText("mt");
+                odoUnits.setText(R.string.mt);
                 break;
         }
         if (distance != 0){
@@ -473,6 +534,18 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    public void onAppThemeChanged() {
+        setAppTheme();
+        setButtonsColor();
+        recreate();
+    }
+
+    @Override
+    public void onBacklitChanged() {
+        setBacklitColor();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         googleApiClient.connect();
@@ -492,6 +565,7 @@ public class MainActivity extends FragmentActivity implements
         googleApiClient.disconnect();
         Log.d(TAG, "--- REMOVING LOCATION UPDATES ---");
         locationManager.removeUpdates(this);
+        vibrator.cancel();
     }
 
     // check if location is enabled.
@@ -598,7 +672,7 @@ public class MainActivity extends FragmentActivity implements
             googleMap.setMyLocationEnabled(true);
             if (currentLocationPressed) {
                 if (isLocationEnabled()) {
-                    DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.green));
+                    ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_currLoc);
                     LatLng latLng = null;
                     if (got_location) {
                         latLng = new LatLng(lat_value, long_value);
@@ -617,7 +691,7 @@ public class MainActivity extends FragmentActivity implements
                     enableLocation();
                 }
             } else {
-                DrawableCompat.setTint(btn_currLoc.getDrawable(), ContextCompat.getColor(getApplicationContext(), R.color.pureWhite));
+                ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_currLoc);
             }
         } else {
             requestLocationPermission();
@@ -727,7 +801,7 @@ public class MainActivity extends FragmentActivity implements
     public void onLocationChanged(Location currentLocation) {
         lat_value = currentLocation.getLatitude();
         long_value = currentLocation.getLongitude();
-        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value);
+        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" "+currentLocation.getSpeed());
         // got_location is used in trackCurrentLocation to obtain lat_value & long_value
         got_location = true;
         // setting latitude value

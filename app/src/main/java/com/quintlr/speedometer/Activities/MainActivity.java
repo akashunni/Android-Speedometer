@@ -708,14 +708,14 @@ public class MainActivity extends FragmentActivity implements
                             cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                                     .target(latLng)
                                     .zoom(18)
-                                    .bearing(degrees)
+                                    .bearing(-degrees)
                                     .tilt(googleMap.getCameraPosition().tilt)
                                     .build());
                         }
                         else{
                             cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                                     .target(latLng)
-                                    .bearing(degrees)
+                                    .bearing(-degrees)
                                     .tilt(googleMap.getCameraPosition().tilt)
                                     .build());
                         }

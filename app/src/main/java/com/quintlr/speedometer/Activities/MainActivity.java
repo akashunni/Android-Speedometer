@@ -58,6 +58,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -87,6 +88,7 @@ public class MainActivity extends FragmentActivity implements
     private ValuesTextView speedo, odo, speedobg, odobg;
     private UnitsTextView speedoUnits, odoUnits, speedoUnitsbg, odoUnitsbg;
     private Button resetBtn;
+    private View separator;
     private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
@@ -133,6 +135,7 @@ public class MainActivity extends FragmentActivity implements
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
         btn_navigation = (AppCompatImageView) findViewById(R.id.navigation);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
+        separator = findViewById(R.id.speedo_sep_horizontal);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //Setting onClickListeners to buttons
@@ -381,6 +384,8 @@ public class MainActivity extends FragmentActivity implements
         ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_mapType);
         ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_navigation);
         ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_settings);
+        ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), resetBtn);
+        ChangeColor.ofView(getApplicationContext(), separator);
     }
 
     void setMapStyle() {
@@ -681,10 +686,21 @@ public class MainActivity extends FragmentActivity implements
                     }
                     if (latLng != null) {
                         CameraUpdate cameraUpdate;
-                        if (zoom)
-                            cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-                        else
-                            cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                        if (zoom){
+                            cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                                    .target(latLng)
+                                    .zoom(18)
+                                    .bearing(degrees)
+                                    .tilt(googleMap.getCameraPosition().tilt)
+                                    .build());
+                        }
+                        else{
+                            cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+                                    .target(latLng)
+                                    .bearing(degrees)
+                                    .tilt(googleMap.getCameraPosition().tilt)
+                                    .build());
+                        }
                         googleMap.animateCamera(cameraUpdate);
                     }
                 } else {

@@ -86,7 +86,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp">
 
-        <include layout="@layout/scroll_content"/>
+        <include
+            layout="@layout/scroll_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </ScrollView>
 

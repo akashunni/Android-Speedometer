@@ -1,10 +1,10 @@
 package com.quintlr.speedometer.Activities;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
-import android.os.Bundle;
 
 import com.quintlr.speedometer.R;
 
@@ -49,6 +49,12 @@ public class AppSettings extends PreferenceActivity {
             if (key.equals("lcdBacklit")){
                 appSettingsChangeListener.onBacklitChanged();
             }
+            if (key.equals("DMS")){
+                appSettingsChangeListener.onLocationUnitsChanged();
+            }
+            if (key.equals("precision")){
+                appSettingsChangeListener.onPrecisionChanged();
+            }
         }
 
         public static void setOnMapStyleChangeListener(AppSettingsChangeListener appSettingsChangeListener){
@@ -59,6 +65,8 @@ public class AppSettings extends PreferenceActivity {
             void onMapStyleChanged();
             void onAppThemeChanged();
             void onBacklitChanged();
+            void onLocationUnitsChanged();
+            void onPrecisionChanged();
         }
     }
 }

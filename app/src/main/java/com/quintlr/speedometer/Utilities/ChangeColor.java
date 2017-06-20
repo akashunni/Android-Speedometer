@@ -1,12 +1,10 @@
 package com.quintlr.speedometer.Utilities;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.AppCompatImageView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Map">
         <ListPreference
             android:defaultValue="0"
@@ -11,6 +10,19 @@
             android:title="Map Style" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Location">
+        <SwitchPreference
+            android:title="Show Location in DMS"
+            android:key="DMS"
+            android:summaryOn="Showing location in Degree Minute Second format"
+            android:summaryOff="Showing location in Decimal format"
+            android:defaultValue="true"/>
+        <EditTextPreference
+            android:title="Precision"
+            android:key="precision"
+            android:summary="Number of digits after the decimal point"
+            android:defaultValue="4"
+            android:numeric="integer"
+            />
         <EditTextPreference
             android:key="speedLimit"
             android:numeric="decimal"
@@ -27,6 +39,7 @@
     <PreferenceCategory android:title="Style">
         <SwitchPreference
             android:title="Dark Theme"
+            android:summary="Inverts color"
             android:key="theme"
             android:defaultValue="true" />
         <SwitchPreference

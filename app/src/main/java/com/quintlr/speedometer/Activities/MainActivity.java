@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -27,7 +26,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
@@ -69,6 +67,7 @@ import com.quintlr.speedometer.Preferences.SharedPrefs;
 import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.quintlr.speedometer.R;
 import com.quintlr.speedometer.Utilities.ChangeColor;
+import com.quintlr.speedometer.Utilities.Conversions;
 import com.quintlr.speedometer.Utilities.OdoValues;
 import com.quintlr.speedometer.Utilities.SpeedoValues;
 
@@ -241,8 +240,7 @@ public class MainActivity extends FragmentActivity implements
             setSpeedoValues();
             setOdoValues();
         }
-        latitude.setText(String.valueOf(lat_value));
-        longitude.setText(String.valueOf(long_value));
+        displayLatLngValues();
         if (alt_value != 0) {
             altitude.setText(String.valueOf(alt_value).concat(" mts."));
         }
@@ -354,6 +352,16 @@ public class MainActivity extends FragmentActivity implements
     }
     
     // setting the values
+
+    void displayLatLngValues() {
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("DMS", true)){
+            latitude.setText(Conversions.fromDecimalToDMS(getApplicationContext(), lat_value));
+            longitude.setText(Conversions.fromDecimalToDMS(getApplicationContext(), long_value));
+        }else {
+            latitude.setText(Conversions.decimalPrecision(getApplicationContext(), lat_value));
+            longitude.setText(Conversions.decimalPrecision(getApplicationContext(), long_value));
+        }
+    }
 
     void setAppTheme(){
         if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("theme", true)){
@@ -548,6 +556,16 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onBacklitChanged() {
         setBacklitColor();
+    }
+
+    @Override
+    public void onLocationUnitsChanged() {
+        displayLatLngValues();
+    }
+
+    @Override
+    public void onPrecisionChanged() {
+        displayLatLngValues();
     }
 
     @Override
@@ -820,14 +838,12 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" "+currentLocation.getSpeed());
         // got_location is used in trackCurrentLocation to obtain lat_value & long_value
         got_location = true;
-        // setting latitude value
-        latitude.setText(String.valueOf(lat_value));
-        // setting longitude value
-        longitude.setText(String.valueOf(long_value));
+        // Displaying the latitude & longitude
+        displayLatLngValues();
         // setting altitude value
         if (currentLocation.hasAltitude()){
             alt_value = (float) currentLocation.getAltitude();
-            altitude.setText(String.valueOf(alt_value).concat(" mts."));
+            altitude.setText(String.valueOf(Conversions.decimalPrecision(getApplicationContext(), alt_value)).concat(" mts."));
         }else {
             altitude.setText(R.string.not_available);
         }
@@ -842,7 +858,8 @@ public class MainActivity extends FragmentActivity implements
         // setting accuracy value
         if (currentLocation.hasAccuracy()){
             acc_value = currentLocation.getAccuracy();
-            accuracy.setText(String.valueOf(Character.toString((char)177)+" "+acc_value+" mts."));
+            accuracy.setText(String.valueOf(Character.toString((char)177)+" "+
+                    Conversions.decimalPrecision(getApplicationContext(), acc_value)+" mts."));
         }else {
             accuracy.setText(R.string.not_available);
         }
@@ -896,8 +913,7 @@ public class MainActivity extends FragmentActivity implements
                     Log.d(TAG, "Got the Last Location...");
                     lat_value = lastLocation.getLatitude();
                     long_value = lastLocation.getLongitude();
-                    latitude.setText(String.valueOf(lat_value));
-                    longitude.setText(String.valueOf(long_value));
+                    displayLatLngValues();
                     CameraUpdate cameraUpdate = CameraUpdateFactory
                             .newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), 18);
                     googleMap.animateCamera(cameraUpdate);

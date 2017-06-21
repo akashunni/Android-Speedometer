@@ -103,9 +103,10 @@ public class MainActivity extends FragmentActivity implements
     private long vibratePattern []= {0, 600, 1000};
     private Location prevLocation = null;
     Location lastLocation;
-    private boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
+    private static boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
-    float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0, display_distance = 0;
+    float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0;
+    private String display_distance="";
     double lat_value = 0, long_value = 0;
     String TAG = "test";
 
@@ -207,7 +208,7 @@ public class MainActivity extends FragmentActivity implements
         outState.putBoolean("got_location", got_location);
         outState.putFloat("speed", speed);
         outState.putFloat("distance", distance);
-        outState.putFloat("display_distance", display_distance);
+        outState.putString("display_distance", display_distance);
         outState.putDouble("lat_value", lat_value);
         outState.putDouble("long_value", long_value);
         outState.putFloat("alt_value", alt_value);
@@ -225,7 +226,7 @@ public class MainActivity extends FragmentActivity implements
         got_location = savedInstanceState.getBoolean("got_location");
         speed = savedInstanceState.getFloat("speed");
         distance = savedInstanceState.getFloat("distance");
-        display_distance = savedInstanceState.getFloat("display_distance");
+        display_distance = savedInstanceState.getString("display_distance");
         lat_value = savedInstanceState.getDouble("lat_value");
         long_value = savedInstanceState.getDouble("long_value");
         alt_value = savedInstanceState.getFloat("alt_value");
@@ -248,7 +249,7 @@ public class MainActivity extends FragmentActivity implements
             accuracy.setText(String.valueOf(Character.toString((char) 177) + " " + acc_value + " mts."));
         }
         if (degrees != 0) {
-            direction.setText(String.valueOf(Conversions.degreesToDirection(degrees)+" ("+degrees+(char)176+")"));
+            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees)+" ("+degrees+(char)176+")"));
         }
         Log.d(TAG, "onRestoreInstanceState: "+lat_value+"::"+long_value);
         super.onRestoreInstanceState(savedInstanceState);
@@ -487,16 +488,14 @@ public class MainActivity extends FragmentActivity implements
                 odoUnits.setText(R.string.mt);
                 break;
         }
-        if (distance != 0){
-            setOdoValues();
-        }
+        setOdoValues();
     }
 
     void setOdoValues(){
-        display_distance = OdoValues.getDisplayDistance(distance,
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("odoUnits", 0));
-        if (display_distance <= 999.99){
-            odo.setText(String.format("%4.02f", display_distance));
+        display_distance = OdoValues.getDisplayDistance(getApplicationContext(), distance);
+        if (Float.parseFloat(display_distance) <= 999.99){
+            Log.d(TAG, "setOdoValues: "+display_distance);
+            odo.setText(display_distance);
         }else {
             distance = 0;
         }
@@ -551,6 +550,10 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "--- REMOVING LOCATION UPDATES ---");
         locationManager.removeUpdates(this);
         vibrator.cancel();
+    }
+
+    public static boolean gotLocation(){
+        return got_location;
     }
 
     // check if location is enabled.
@@ -669,7 +672,7 @@ public class MainActivity extends FragmentActivity implements
                         if (zoom){
                             cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                                     .target(latLng)
-                                    .zoom(18)
+                                    .zoom(18)// min = 2.0, max = 21.0
                                     .bearing(degrees)
                                     .tilt(googleMap.getCameraPosition().tilt)
                                     .build());
@@ -797,7 +800,6 @@ public class MainActivity extends FragmentActivity implements
     public void onLocationChanged(Location currentLocation) {
         lat_value = currentLocation.getLatitude();
         long_value = currentLocation.getLongitude();
-        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" "+currentLocation.getSpeed());
         // got_location is used in trackCurrentLocation to obtain lat_value & long_value
         got_location = true;
         // Displaying the latitude & longitude
@@ -812,7 +814,7 @@ public class MainActivity extends FragmentActivity implements
         // setting direction value
         if (currentLocation.hasBearing()){
             degrees = currentLocation.getBearing();
-            direction.setText(String.valueOf(Conversions.degreesToDirection(degrees)+" ("+degrees+(char)176+")"));
+            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees)+" ("+degrees+(char)176+")"));
         }else {
             direction.setText(R.string.not_available);
         }
@@ -858,6 +860,8 @@ public class MainActivity extends FragmentActivity implements
         } else {
             distanceRefresh++;
         }*/
+        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" S:"+currentLocation.getSpeed()+" D:"+distance
+        +" Ac:"+acc_value);
 
         prevLocation = currentLocation;
     }

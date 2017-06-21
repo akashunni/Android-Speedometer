@@ -1,6 +1,12 @@
 package com.quintlr.speedometer.Utilities;
 
+import android.content.Context;
 import android.location.Location;
+import android.preference.PreferenceManager;
+
+import com.quintlr.speedometer.R;
+
+import java.text.DecimalFormat;
 
 /**
  * Created by akash on 25/5/17.
@@ -8,20 +14,20 @@ import android.location.Location;
 
 public class OdoValues {
 
-    public static float getDisplayDistance(float distance, int units) {
-        switch (units) {
+    public static String getDisplayDistance(Context context, float distance) {
+        switch (PreferenceManager.getDefaultSharedPreferences(context).getInt("odoUnits", 0)) {
             // km
             case 0:
-                return distance / 1000;
+                return String.format("%4.1f",distance/1000);
             // miles
             case 1:
-                return (float) (distance / 1609.344);
+                return String.format("%4.1f",(distance / 1609.344));
             // meter
             case 2:
-                return distance;
+                return String.format("%3.2f",distance);
             // error
             default:
-                return -1;
+                return context.getResources().getString(R.string.hyphen_5);
         }
     }
 

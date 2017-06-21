@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.quintlr.speedometer.Activities.MainActivity;
 import com.quintlr.speedometer.R;
 
 /**
@@ -13,6 +15,8 @@ import com.quintlr.speedometer.R;
 
 public class Conversions {
     public static String fromDecimalToDMS(Context context, double location){
+        if (location == 0 && !MainActivity.gotLocation())
+            return context.getResources().getString(R.string.not_available);
         String DMS = Location.convert(location, Location.FORMAT_SECONDS);
         DMS = DMS.replaceFirst(":", String.valueOf((char)176)+" ");
         DMS = DMS.replaceFirst(":", "' ");
@@ -24,6 +28,8 @@ public class Conversions {
     }
 
     public static String decimalPrecision(Context context, double value){
+        if (value == 0 && !MainActivity.gotLocation())
+            return context.getResources().getString(R.string.not_available);
         String newValue = String.valueOf(value);
         int lastIndex = newValue.indexOf('.') + Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("precision", "4")) + 1;
         if (lastIndex < newValue.length()){
@@ -33,7 +39,7 @@ public class Conversions {
     }
 
     // takes degrees as input and returns the respective direction.
-    public static String degreesToDirection(double degrees){
+    public static String degreesToDirection(Context context, double degrees){
         if (degrees >= 348.75 && degrees <= 360 || degrees >= 0 && degrees < 11.25){
             return "N";
         }else if (degrees >= 11.25 && degrees < 33.75){
@@ -67,6 +73,6 @@ public class Conversions {
         }else if (degrees >= 326.25 && degrees < 348.75){
             return "NNW";
         }
-        return Resources.getSystem().getString(R.string.not_available);
+        return context.getResources().getString(R.string.not_available);
     }
 }

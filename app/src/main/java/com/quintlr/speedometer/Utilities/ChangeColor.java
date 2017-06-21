@@ -1,6 +1,7 @@
 package com.quintlr.speedometer.Utilities;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;

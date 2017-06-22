@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Activities;
+package com.akashunni.speedometer.Activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -60,16 +61,16 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.quintlr.speedometer.Fonts.UnitsTextView;
-import com.quintlr.speedometer.Fonts.ValuesTextView;
-import com.quintlr.speedometer.Preferences.OdoUnitsPreferenceDialog;
-import com.quintlr.speedometer.Preferences.SharedPrefs;
-import com.quintlr.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
-import com.quintlr.speedometer.R;
-import com.quintlr.speedometer.Utilities.ChangeColor;
-import com.quintlr.speedometer.Utilities.Conversions;
-import com.quintlr.speedometer.Utilities.OdoValues;
-import com.quintlr.speedometer.Utilities.SpeedoValues;
+import com.akashunni.speedometer.Fonts.UnitsTextView;
+import com.akashunni.speedometer.Fonts.ValuesTextView;
+import com.akashunni.speedometer.Preferences.OdoUnitsPreferenceDialog;
+import com.akashunni.speedometer.Preferences.SharedPrefs;
+import com.akashunni.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
+import com.akashunni.speedometer.R;
+import com.akashunni.speedometer.Utilities.ChangeColor;
+import com.akashunni.speedometer.Utilities.Conversions;
+import com.akashunni.speedometer.Utilities.OdoValues;
+import com.akashunni.speedometer.Utilities.SpeedoValues;
 
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -91,6 +92,7 @@ public class MainActivity extends FragmentActivity implements
     private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
+    private SupportMapFragment mapFragment;
     private PlaceAutocompleteFragment searchFragment;
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_navigation, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
@@ -164,7 +166,7 @@ public class MainActivity extends FragmentActivity implements
         AppSettings.AppSettingsFragment.setOnMapStyleChangeListener(this);
 
         //attach fragment map with this activity.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_map);
         mapFragment.getMapAsync(this);
 
         //attach search fragment with this activity.
@@ -544,6 +546,12 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    protected void onResume() {
+        mapFragment.onResume();
+        super.onResume();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         googleApiClient.disconnect();
@@ -845,21 +853,16 @@ public class MainActivity extends FragmentActivity implements
 
         //////////////////////////////////////////////////
         // The distance thing...
-        distance += OdoValues.getDistance(prevLocation, currentLocation);
+        if (currentLocation.hasAccuracy() &&
+                (OdoValues.getDistance(prevLocation, currentLocation) >= acc_value)){
+            distance += OdoValues.getDistance(prevLocation, currentLocation);
+        }
         // saving distance in shared preferences.
         SharedPrefs.setDistance(getApplicationContext(), distance);
         // sets the odo values in UI
         setOdoValues();
-        /*if (distanceRefresh == 7){
-            distanceRefresh = 0;
-            distance += OdoValues.getDistance(prevLocation, currentLocation);
-            // saving distance in shared preferences.
-            SharedPrefs.setDistance(getApplicationContext(), distance);
-            // sets the odo values in UI
-            setOdoValues();
-        } else {
-            distanceRefresh++;
-        }*/
+
+
         Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" S:"+currentLocation.getSpeed()+" D:"+distance
         +" Ac:"+acc_value);
 

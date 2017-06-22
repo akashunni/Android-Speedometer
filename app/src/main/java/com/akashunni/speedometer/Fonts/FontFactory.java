@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Fonts;
+package com.akashunni.speedometer.Fonts;
 
 import android.content.Context;
 import android.graphics.Typeface;

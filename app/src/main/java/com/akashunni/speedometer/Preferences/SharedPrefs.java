@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Preferences;
+package com.akashunni.speedometer.Preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;

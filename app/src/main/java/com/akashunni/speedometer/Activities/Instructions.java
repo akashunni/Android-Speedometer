@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Activities;
+package com.akashunni.speedometer.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.quintlr.speedometer.Preferences.SharedPrefs;
-import com.quintlr.speedometer.R;
+import com.akashunni.speedometer.Preferences.SharedPrefs;
+import com.akashunni.speedometer.R;
 
 public class Instructions extends AppCompatActivity {
 

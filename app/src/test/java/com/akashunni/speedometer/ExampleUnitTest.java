@@ -1,4 +1,4 @@
-package com.quintlr.speedometer;
+package com.akashunni.speedometer;
 
 import org.junit.Test;
 

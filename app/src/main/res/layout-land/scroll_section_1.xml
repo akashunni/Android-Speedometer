@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.quintlr.speedometer.Fonts.ValuesTextView
+    <com.akashunni.speedometer.Fonts.ValuesTextView
         android:id="@+id/speedobg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp" />
 
-    <com.quintlr.speedometer.Fonts.ValuesTextView
+    <com.akashunni.speedometer.Fonts.ValuesTextView
         android:id="@+id/speedo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         app:layout_constraintRight_toRightOf="@+id/speedobg"
         app:layout_constraintBaseline_toBaselineOf="@+id/speedobg" />
 
-    <com.quintlr.speedometer.Fonts.UnitsTextView
+    <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/speedounitsbg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <com.quintlr.speedometer.Fonts.UnitsTextView
+    <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/speedounits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
         app:layout_constraintRight_toRightOf="@+id/speedounitsbg"
         app:layout_constraintBaseline_toBaselineOf="@+id/speedounitsbg" />
 
-    <com.quintlr.speedometer.Fonts.ValuesTextView
+    <com.akashunni.speedometer.Fonts.ValuesTextView
         android:id="@+id/odobg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 
-    <com.quintlr.speedometer.Fonts.ValuesTextView
+    <com.akashunni.speedometer.Fonts.ValuesTextView
         android:id="@+id/odo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
         app:layout_constraintRight_toRightOf="@+id/odobg"
         app:layout_constraintBaseline_toBaselineOf="@+id/odobg" />
 
-    <com.quintlr.speedometer.Fonts.UnitsTextView
+    <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/odounitsbg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@+id/odo" />
 
-    <com.quintlr.speedometer.Fonts.UnitsTextView
+    <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/odounits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

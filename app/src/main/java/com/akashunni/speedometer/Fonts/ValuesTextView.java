@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Fonts;
+package com.akashunni.speedometer.Fonts;
 
 import android.annotation.TargetApi;
 import android.content.Context;

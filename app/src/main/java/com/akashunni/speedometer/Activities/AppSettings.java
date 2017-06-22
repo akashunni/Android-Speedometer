@@ -1,4 +1,4 @@
-package com.quintlr.speedometer.Activities;
+package com.akashunni.speedometer.Activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 
-import com.quintlr.speedometer.R;
+import com.akashunni.speedometer.R;
 
 public class AppSettings extends PreferenceActivity {
     @Override

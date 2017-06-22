@@ -1,12 +1,10 @@
-package com.quintlr.speedometer.Utilities;
+package com.akashunni.speedometer.Utilities;
 
 import android.content.Context;
 import android.location.Location;
 import android.preference.PreferenceManager;
 
-import com.quintlr.speedometer.R;
-
-import java.text.DecimalFormat;
+import com.akashunni.speedometer.R;
 
 /**
  * Created by akash on 25/5/17.

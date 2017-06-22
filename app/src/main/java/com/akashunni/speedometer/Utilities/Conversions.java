@@ -1,13 +1,11 @@
-package com.quintlr.speedometer.Utilities;
+package com.akashunni.speedometer.Utilities;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.quintlr.speedometer.Activities.MainActivity;
-import com.quintlr.speedometer.R;
+import com.akashunni.speedometer.Activities.MainActivity;
+import com.akashunni.speedometer.R;
 
 /**
  * Created by akash on 21/6/17.

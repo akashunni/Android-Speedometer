@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.quintlr.speedometer">
+    package="com.akashunni.speedometer">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -37,7 +37,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.akashunni.speedometer.Activities.MainActivity"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
@@ -50,7 +50,7 @@
             -->
         </activity>
         <activity
-            android:name=".Activities.Splash_Screen"
+            android:name="com.akashunni.speedometer.Activities.Splash_Screen"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -59,20 +59,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.Instructions"
+            android:name="com.akashunni.speedometer.Activities.Instructions"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.AppSettings"
+            android:name="com.akashunni.speedometer.Activities.AppSettings"
             android:label="Settings"
-            android:parentActivityName=".Activities.MainActivity"
+            android:parentActivityName="com.akashunni.speedometer.Activities.MainActivity"
             android:theme="@style/SettingsTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.quintlr.speedometer.Activities.MainActivity" />
+                android:value="com.akashunni.speedometer.Activities.MainActivity" />
         </activity>
     </application>
 

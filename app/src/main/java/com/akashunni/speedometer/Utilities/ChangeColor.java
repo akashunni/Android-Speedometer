@@ -1,7 +1,6 @@
-package com.quintlr.speedometer.Utilities;
+package com.akashunni.speedometer.Utilities;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -10,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.quintlr.speedometer.R;
+import com.akashunni.speedometer.R;
 
 /**
  * Created by akash on 20/6/17.

@@ -23,6 +23,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         resValue("string", "google_maps_key", google_maps_key)
         resValue("string", "banner_ad_unit_id", banner_ad_unit_id)
+        resValue("string", "interstitial_ad_unit_id", interstitial_ad_unit_id)
     }
     buildTypes {
         release {

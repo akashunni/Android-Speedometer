@@ -17,9 +17,20 @@ public class AppSettings extends PreferenceActivity {
                 .commit();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (AppSettingsFragment.settingsChanged && MainActivity.interstitialAd.isLoaded()){
+            MainActivity.interstitialAd.show();
+            AppSettingsFragment.settingsChanged = false;
+            MainActivity.loadInterstitialAd(getApplicationContext());
+        }
+    }
+
     public static class AppSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
         String TAG = "TEST";
         private static AppSettingsChangeListener appSettingsChangeListener;
+        private static boolean settingsChanged = false;
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -40,6 +51,7 @@ public class AppSettings extends PreferenceActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            settingsChanged = true;
             if (key.equals("mapStyle")){
                 appSettingsChangeListener.onMapStyleChanged();
             }

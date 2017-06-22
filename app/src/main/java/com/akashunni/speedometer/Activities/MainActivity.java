@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -96,6 +97,7 @@ public class MainActivity extends FragmentActivity implements
     private PlaceAutocompleteFragment searchFragment;
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_navigation, btn_settings;
     private FragmentManager fragmentManager = getSupportFragmentManager();
+    static InterstitialAd interstitialAd;
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int REQUEST_CHECK_SETTINGS = 777;
     public static final float SMALLEST_DISPLACEMENT = 0.5f;
@@ -193,6 +195,8 @@ public class MainActivity extends FragmentActivity implements
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .addTestDevice("E7A76C31163F0B32B56A88C78F40E833") //OP3T
                 .build());
+
+        loadInterstitialAd(getApplicationContext());
 
         //assigning distance value
         distance = SharedPrefs.getDistance(getApplicationContext());
@@ -352,6 +356,15 @@ public class MainActivity extends FragmentActivity implements
             default:
                 return false;
         }
+    }
+
+    //Interstitial ad.
+    static void loadInterstitialAd(Context context){
+        interstitialAd = new InterstitialAd(context);
+        interstitialAd.setAdUnitId(context.getResources().getString(R.string.interstitial_ad_unit_id));
+        interstitialAd.loadAd(new AdRequest.Builder()
+                .addTestDevice("E7A76C31163F0B32B56A88C78F40E833")
+                .build());
     }
     
     // setting the values

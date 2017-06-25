@@ -16,23 +16,23 @@ public class OdoValues {
         switch (PreferenceManager.getDefaultSharedPreferences(context).getInt("odoUnits", 0)) {
             // km
             case 0:
-                return String.format("%4.1f",distance/1000);
+                return String.format("%4.1f", distance / 1000);
             // miles
             case 1:
-                return String.format("%4.1f",(distance / 1609.344));
+                return String.format("%4.1f", (distance / 1609.344));
             // meter
             case 2:
-                return String.format("%3.2f",distance);
+                return String.format("%3.2f", distance);
             // error
             default:
                 return context.getResources().getString(R.string.hyphen_5);
         }
     }
 
-    public static float getDistance(Location prevLocation, Location currentLocation){
-        if (prevLocation != null && currentLocation != null){
+    public static float getDistance(Location prevLocation, Location currentLocation) {
+        if (prevLocation != null && currentLocation != null) {
             return currentLocation.distanceTo(prevLocation);
-        }else {
+        } else {
             return 0;
         }
     }

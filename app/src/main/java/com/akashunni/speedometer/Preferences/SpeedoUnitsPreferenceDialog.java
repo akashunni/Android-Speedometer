@@ -40,14 +40,14 @@ public class SpeedoUnitsPreferenceDialog extends DialogFragment {
         return dialog.create();
     }
 
-    public void setOnClickListener(SpeedoUnitClickListener speedoUnitClickListener){
+    public void setOnClickListener(SpeedoUnitClickListener speedoUnitClickListener) {
         this.speedoUnitClickListener = speedoUnitClickListener;
     }
 
     DialogInterface.OnClickListener itemClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            if (selectedValue != which){
+            if (selectedValue != which) {
                 selectedValue = which;
                 speedoUnitsPreference.edit().putInt("speedoUnits", selectedValue).apply();
                 speedoUnitClickListener.onSpeedoUnitClickListener();
@@ -56,7 +56,7 @@ public class SpeedoUnitsPreferenceDialog extends DialogFragment {
         }
     };
 
-    public interface SpeedoUnitClickListener{
+    public interface SpeedoUnitClickListener {
         void onSpeedoUnitClickListener();
     }
 

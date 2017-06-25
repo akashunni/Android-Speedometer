@@ -38,8 +38,7 @@
 
     </android.support.v7.widget.CardView>
 
-    <com.google.android.gms.ads.AdView
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id"
@@ -82,7 +81,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/adView"
         app:layout_constraintBottom_toBottomOf="@+id/adView" />
-
 
 
 </android.support.constraint.ConstraintLayout>

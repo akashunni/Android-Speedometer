@@ -11,11 +11,11 @@ public class Splash_Screen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (SharedPrefs.isFirstTime(getApplicationContext())){
+        if (SharedPrefs.isFirstTime(getApplicationContext())) {
             Intent intent = new Intent(getApplicationContext(), Instructions.class);
             startActivity(intent);
             finish();
-        }else {
+        } else {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();

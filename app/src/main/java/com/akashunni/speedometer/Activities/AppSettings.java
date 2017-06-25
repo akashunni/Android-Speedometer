@@ -20,17 +20,18 @@ public class AppSettings extends PreferenceActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (AppSettingsFragment.settingsChanged && MainActivity.interstitialAd.isLoaded()){
+        if (AppSettingsFragment.settingsChanged && MainActivity.interstitialAd.isLoaded()) {
             MainActivity.interstitialAd.show();
             AppSettingsFragment.settingsChanged = false;
             MainActivity.loadInterstitialAd(getApplicationContext());
         }
     }
 
-    public static class AppSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+    public static class AppSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         String TAG = "TEST";
         private static AppSettingsChangeListener appSettingsChangeListener;
         private static boolean settingsChanged = false;
+
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -52,32 +53,36 @@ public class AppSettings extends PreferenceActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             settingsChanged = true;
-            if (key.equals("mapStyle")){
+            if (key.equals("mapStyle")) {
                 appSettingsChangeListener.onMapStyleChanged();
             }
-            if (key.equals("theme")){
+            if (key.equals("theme")) {
                 appSettingsChangeListener.onAppThemeChanged();
             }
-            if (key.equals("lcdBacklit")){
+            if (key.equals("lcdBacklit")) {
                 appSettingsChangeListener.onBacklitChanged();
             }
-            if (key.equals("DMS")){
+            if (key.equals("DMS")) {
                 appSettingsChangeListener.onLocationUnitsChanged();
             }
-            if (key.equals("precision")){
+            if (key.equals("precision")) {
                 appSettingsChangeListener.onPrecisionChanged();
             }
         }
 
-        public static void setOnMapStyleChangeListener(AppSettingsChangeListener appSettingsChangeListener){
+        public static void setOnMapStyleChangeListener(AppSettingsChangeListener appSettingsChangeListener) {
             AppSettingsFragment.appSettingsChangeListener = appSettingsChangeListener;
         }
 
         public interface AppSettingsChangeListener {
             void onMapStyleChanged();
+
             void onAppThemeChanged();
+
             void onBacklitChanged();
+
             void onLocationUnitsChanged();
+
             void onPrecisionChanged();
         }
     }

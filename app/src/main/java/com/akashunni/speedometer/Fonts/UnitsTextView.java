@@ -23,18 +23,19 @@ public class UnitsTextView extends TextView {
 
     public UnitsTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        if(!isInEditMode())
+        if (!isInEditMode())
             init();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public UnitsTextView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        if(!isInEditMode())
+        if (!isInEditMode())
             init();
     }
-    private void init(){
-        if(!isInEditMode()){
+
+    private void init() {
+        if (!isInEditMode()) {
             Typeface typeface_units = FontFactory.getInstance().getFontForUnits(getContext());
             setTypeface(typeface_units);
         }

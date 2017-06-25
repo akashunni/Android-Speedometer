@@ -34,7 +34,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
+import com.akashunni.speedometer.Fonts.UnitsTextView;
+import com.akashunni.speedometer.Fonts.ValuesTextView;
+import com.akashunni.speedometer.Preferences.OdoUnitsPreferenceDialog;
+import com.akashunni.speedometer.Preferences.SharedPrefs;
+import com.akashunni.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
+import com.akashunni.speedometer.R;
+import com.akashunni.speedometer.Utilities.ChangeColor;
+import com.akashunni.speedometer.Utilities.Conversions;
+import com.akashunni.speedometer.Utilities.OdoValues;
+import com.akashunni.speedometer.Utilities.SpeedoValues;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -62,16 +71,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.akashunni.speedometer.Fonts.UnitsTextView;
-import com.akashunni.speedometer.Fonts.ValuesTextView;
-import com.akashunni.speedometer.Preferences.OdoUnitsPreferenceDialog;
-import com.akashunni.speedometer.Preferences.SharedPrefs;
-import com.akashunni.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
-import com.akashunni.speedometer.R;
-import com.akashunni.speedometer.Utilities.ChangeColor;
-import com.akashunni.speedometer.Utilities.Conversions;
-import com.akashunni.speedometer.Utilities.OdoValues;
-import com.akashunni.speedometer.Utilities.SpeedoValues;
 
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -84,7 +83,7 @@ public class MainActivity extends FragmentActivity implements
         OdoUnitsPreferenceDialog.OdoUnitClickListener,
         LocationListener,
         SensorEventListener,
-        PlaceSelectionListener{
+        PlaceSelectionListener {
 
     private ValuesTextView speedo, odo, speedobg, odobg;
     private UnitsTextView speedoUnits, odoUnits, speedoUnitsbg, odoUnitsbg;
@@ -101,16 +100,16 @@ public class MainActivity extends FragmentActivity implements
     public static final int LOCATION_PERMISSION_ID = 9999;
     public static final int REQUEST_CHECK_SETTINGS = 777;
     public static final float SMALLEST_DISPLACEMENT = 0.5f;
-    public static final long UPDATE_INTERVAL = 2*1000;
+    public static final long UPDATE_INTERVAL = 2 * 1000;
     private int speedRefresh = 0, distanceRefresh = 0;
     private Vibrator vibrator;
-    private long vibratePattern []= {0, 600, 1000};
+    private long vibratePattern[] = {0, 600, 1000};
     private Location prevLocation = null;
     Location lastLocation;
     private static boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
     private LocationManager locationManager;
     float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0;
-    private String display_distance="";
+    private String display_distance = "";
     double lat_value = 0, long_value = 0;
     String TAG = "test";
 
@@ -162,7 +161,7 @@ public class MainActivity extends FragmentActivity implements
         setBacklitColor();
 
         // Initialising vibrator
-        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // setting on map changed listener
         AppSettings.AppSettingsFragment.setOnMapStyleChangeListener(this);
@@ -220,7 +219,7 @@ public class MainActivity extends FragmentActivity implements
         outState.putFloat("alt_value", alt_value);
         outState.putFloat("acc_value", acc_value);
         outState.putFloat("degrees", degrees);
-        Log.d(TAG, "onSaveInstanceState: "+lat_value+"::"+long_value);
+        Log.d(TAG, "onSaveInstanceState: " + lat_value + "::" + long_value);
         super.onSaveInstanceState(outState);
     }
 
@@ -238,12 +237,12 @@ public class MainActivity extends FragmentActivity implements
         alt_value = savedInstanceState.getFloat("alt_value");
         acc_value = savedInstanceState.getFloat("acc_value");
         degrees = savedInstanceState.getFloat("degrees");
-        if (currentLocationPressed){
+        if (currentLocationPressed) {
             ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_currLoc);
-        }else {
+        } else {
             ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_currLoc);
         }
-        if (got_location){
+        if (got_location) {
             setSpeedoValues();
             setOdoValues();
         }
@@ -255,9 +254,9 @@ public class MainActivity extends FragmentActivity implements
             accuracy.setText(String.valueOf(Character.toString((char) 177) + " " + acc_value + " mts."));
         }
         if (degrees != 0) {
-            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees)+" ("+degrees+(char)176+")"));
+            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees) + " (" + degrees + (char) 176 + ")"));
         }
-        Log.d(TAG, "onRestoreInstanceState: "+lat_value+"::"+long_value);
+        Log.d(TAG, "onRestoreInstanceState: " + lat_value + "::" + long_value);
         super.onRestoreInstanceState(savedInstanceState);
     }
 
@@ -359,42 +358,42 @@ public class MainActivity extends FragmentActivity implements
     }
 
     //Interstitial ad.
-    static void loadInterstitialAd(Context context){
+    static void loadInterstitialAd(Context context) {
         interstitialAd = new InterstitialAd(context);
         interstitialAd.setAdUnitId(context.getResources().getString(R.string.interstitial_ad_unit_id));
         interstitialAd.loadAd(new AdRequest.Builder()
                 .addTestDevice("E7A76C31163F0B32B56A88C78F40E833")
                 .build());
     }
-    
+
     // setting the values
 
     void displayLatLngValues() {
-        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("DMS", true)){
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("DMS", true)) {
             latitude.setText(Conversions.fromDecimalToDMS(getApplicationContext(), lat_value));
             longitude.setText(Conversions.fromDecimalToDMS(getApplicationContext(), long_value));
-        }else {
+        } else {
             latitude.setText(Conversions.decimalPrecision(getApplicationContext(), lat_value));
             longitude.setText(Conversions.decimalPrecision(getApplicationContext(), long_value));
         }
     }
 
-    void setAppTheme(){
-        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("theme", true)){
+    void setAppTheme() {
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("theme", true)) {
             setTheme(R.style.DarkTheme);
-        }else {
+        } else {
             setTheme(R.style.LightTheme);
         }
     }
 
-    void setBacklitColor(){
+    void setBacklitColor() {
         // setting lcd backlit properties
-        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("lcdBacklit", true)){
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("lcdBacklit", true)) {
             ChangeColor.ofTextView(speedobg, getResources().getColor(R.color.lcdbg));
             ChangeColor.ofTextView(speedoUnitsbg, getResources().getColor(R.color.lcdbg));
             ChangeColor.ofTextView(odobg, getResources().getColor(R.color.lcdbg));
             ChangeColor.ofTextView(odoUnitsbg, getResources().getColor(R.color.lcdbg));
-        }else {
+        } else {
             ChangeColor.ofTextView(speedobg, getResources().getColor(R.color.transparent));
             ChangeColor.ofTextView(speedoUnitsbg, getResources().getColor(R.color.transparent));
             ChangeColor.ofTextView(odobg, getResources().getColor(R.color.transparent));
@@ -460,31 +459,31 @@ public class MainActivity extends FragmentActivity implements
                 speedoUnits.setText(R.string.mt_sec);
                 break;
         }
-        if (got_location){
+        if (got_location) {
             setSpeedoValues();
         }
     }
 
-    void setSpeedoValues(){
-        if (speed == -1){
-            if (speedRefresh >= 3){
+    void setSpeedoValues() {
+        if (speed == -1) {
+            if (speedRefresh >= 3) {
                 speedo.setText(R.string.hyphen_4);
                 speedRefresh = 0;
             }
-        }else if (speed > 999.99){
+        } else if (speed > 999.99) {
             speedo.setText("high");
-        }else {
+        } else {
             speedo.setText(String.format("%3.01f", speed));
             speedRefresh = 0;
         }
 
-        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "0"))){
-            if (vibrator.hasVibrator()){
+        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "40"))) {
+            if (vibrator.hasVibrator()) {
                 vibrator.vibrate(vibratePattern, 0);
             }
             ChangeColor.ofTextView(speedo, getResources().getColor(R.color.red));
-        }else {
-            if (vibrator.hasVibrator()){
+        } else {
+            if (vibrator.hasVibrator()) {
                 vibrator.cancel();
             }
             ChangeColor.ofTextViewToNormal(getApplicationContext(), speedo);
@@ -506,12 +505,12 @@ public class MainActivity extends FragmentActivity implements
         setOdoValues();
     }
 
-    void setOdoValues(){
+    void setOdoValues() {
         display_distance = OdoValues.getDisplayDistance(getApplicationContext(), distance);
-        if (Float.parseFloat(display_distance) <= 999.99){
-            Log.d(TAG, "setOdoValues: "+display_distance);
+        if (Float.parseFloat(display_distance) <= 999.99) {
+            Log.d(TAG, "setOdoValues: " + display_distance);
             odo.setText(display_distance);
-        }else {
+        } else {
             distance = 0;
         }
     }
@@ -573,14 +572,14 @@ public class MainActivity extends FragmentActivity implements
         vibrator.cancel();
     }
 
-    public static boolean gotLocation(){
+    public static boolean gotLocation() {
         return got_location;
     }
 
     // check if location is enabled.
     boolean isLocationEnabled() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             // location enabled
             requestLocationUpdates();
             return true;
@@ -591,9 +590,9 @@ public class MainActivity extends FragmentActivity implements
     }
 
     // Requesting location updates from respective providers.
-    void requestLocationUpdates(){
-        if (checkLocationPermission()){
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+    void requestLocationUpdates() {
+        if (checkLocationPermission()) {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Log.d(TAG, "+++ REQUESTING GPS LOCATION UPDATES +++");
                 // High Accuracy
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -690,15 +689,14 @@ public class MainActivity extends FragmentActivity implements
                     }
                     if (latLng != null) {
                         CameraUpdate cameraUpdate;
-                        if (zoom){
+                        if (zoom) {
                             cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                                     .target(latLng)
                                     .zoom(18)// min = 2.0, max = 21.0
                                     .bearing(degrees)
                                     .tilt(googleMap.getCameraPosition().tilt)
                                     .build());
-                        }
-                        else{
+                        } else {
                             cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                                     .target(latLng)
                                     .bearing(degrees)
@@ -826,30 +824,30 @@ public class MainActivity extends FragmentActivity implements
         // Displaying the latitude & longitude
         displayLatLngValues();
         // setting altitude value
-        if (currentLocation.hasAltitude()){
+        if (currentLocation.hasAltitude()) {
             alt_value = (float) currentLocation.getAltitude();
             altitude.setText(String.valueOf(Conversions.decimalPrecision(getApplicationContext(), alt_value)).concat(" mts."));
-        }else {
+        } else {
             altitude.setText(R.string.not_available);
         }
         // setting direction value
-        if (currentLocation.hasBearing()){
+        if (currentLocation.hasBearing()) {
             degrees = currentLocation.getBearing();
-            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees)+" ("+degrees+(char)176+")"));
-        }else {
+            direction.setText(String.valueOf(Conversions.degreesToDirection(getApplicationContext(), degrees) + " (" + degrees + (char) 176 + ")"));
+        } else {
             direction.setText(R.string.not_available);
         }
 
         // setting accuracy value
-        if (currentLocation.hasAccuracy()){
+        if (currentLocation.hasAccuracy()) {
             acc_value = currentLocation.getAccuracy();
-            accuracy.setText(String.valueOf(Character.toString((char)177)+" "+
-                    Conversions.decimalPrecision(getApplicationContext(), acc_value)+" mts."));
-        }else {
+            accuracy.setText(String.valueOf(Character.toString((char) 177) + " " +
+                    Conversions.decimalPrecision(getApplicationContext(), acc_value) + " mts."));
+        } else {
             accuracy.setText(R.string.not_available);
         }
 
-        if (currentLocationPressed){
+        if (currentLocationPressed) {
             trackCurrentLocation(true);
         }
 
@@ -867,7 +865,7 @@ public class MainActivity extends FragmentActivity implements
         //////////////////////////////////////////////////
         // The distance thing...
         if (currentLocation.hasAccuracy() &&
-                (OdoValues.getDistance(prevLocation, currentLocation) >= acc_value)){
+                (OdoValues.getDistance(prevLocation, currentLocation) >= acc_value)) {
             distance += OdoValues.getDistance(prevLocation, currentLocation);
         }
         // saving distance in shared preferences.
@@ -876,8 +874,8 @@ public class MainActivity extends FragmentActivity implements
         setOdoValues();
 
 
-        Log.d(TAG, "onLocationChanged: "+lat_value+" "+long_value+" S:"+currentLocation.getSpeed()+" D:"+distance
-        +" Ac:"+acc_value);
+        Log.d(TAG, "onLocationChanged: " + lat_value + " " + long_value + " S:" + currentLocation.getSpeed() + " D:" + distance
+                + " Ac:" + acc_value);
 
         prevLocation = currentLocation;
     }

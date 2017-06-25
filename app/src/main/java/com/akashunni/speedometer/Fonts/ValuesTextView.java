@@ -14,13 +14,13 @@ public class ValuesTextView extends TextView {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ValuesTextView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        if(!isInEditMode())
+        if (!isInEditMode())
             init();
     }
 
     public ValuesTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        if(!isInEditMode())
+        if (!isInEditMode())
             init();
     }
 
@@ -34,8 +34,8 @@ public class ValuesTextView extends TextView {
         init();
     }
 
-    private void init(){
-        if(!isInEditMode()){
+    private void init() {
+        if (!isInEditMode()) {
             Typeface typeface_units = FontFactory.getInstance().getFontForValues(getContext());
             setTypeface(typeface_units);
         }

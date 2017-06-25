@@ -15,6 +15,7 @@ import com.akashunni.speedometer.R;
 public class Instructions extends AppCompatActivity {
 
     Button btn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +28,10 @@ public class Instructions extends AppCompatActivity {
         asyncActivityLoader.execute();
     }
 
-    private class AsyncActivityLoader extends AsyncTask<String, Void, Intent>{
+    private class AsyncActivityLoader extends AsyncTask<String, Void, Intent> {
         Context context;
-        AsyncActivityLoader(Context context){
+
+        AsyncActivityLoader(Context context) {
             this.context = context;
         }
 

@@ -17,44 +17,44 @@ import com.akashunni.speedometer.R;
 
 public class ChangeColor {
 
-    public static void ofButtonDrawableToActive(Context context, AppCompatImageView imageView){
+    public static void ofButtonDrawableToActive(Context context, AppCompatImageView imageView) {
         DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(context, R.color.green));
     }
 
-    public static void ofButtonDrawableToNormal(Context context, AppCompatImageView imageView){
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)){
+    public static void ofButtonDrawableToNormal(Context context, AppCompatImageView imageView) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
             DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(context, R.color.pureWhite));
-        }else {
+        } else {
             DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(context, R.color.pitchBlack));
         }
     }
 
-    public static void ofButtonDrawableToNormal(Context context, Button button){
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)){
+    public static void ofButtonDrawableToNormal(Context context, Button button) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
             DrawableCompat.setTint(button.getBackground(), ContextCompat.getColor(context, R.color.pureWhite));
             button.setTextColor(context.getResources().getColor(R.color.pitchBlack));
-        }else {
+        } else {
             DrawableCompat.setTint(button.getBackground(), ContextCompat.getColor(context, R.color.pitchBlack));
             button.setTextColor(context.getResources().getColor(R.color.pureWhite));
         }
     }
 
-    public static void ofTextView(TextView textView, int color){
+    public static void ofTextView(TextView textView, int color) {
         textView.setTextColor(color);
     }
 
-    public static void ofTextViewToNormal(Context context, TextView textView){
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)){
+    public static void ofTextViewToNormal(Context context, TextView textView) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
             textView.setTextColor(context.getResources().getColor(R.color.pureWhite));
-        }else {
+        } else {
             textView.setTextColor(context.getResources().getColor(R.color.pitchBlack));
         }
     }
 
-    public static void ofView(Context context, View view){
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)){
+    public static void ofView(Context context, View view) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
             view.setBackgroundColor(context.getResources().getColor(R.color.pureWhite));
-        }else {
+        } else {
             view.setBackgroundColor(context.getResources().getColor(R.color.pitchBlack));
         }
     }

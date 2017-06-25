@@ -4,8 +4,7 @@
     <gradient
         android:startColor="@color/green"
         android:centerColor="@color/green"
-        android:endColor="@color/green"
-        />
+        android:endColor="@color/green" />
 
     <padding
         android:bottom="1dp"

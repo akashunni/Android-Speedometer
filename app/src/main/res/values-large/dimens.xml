@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- for large devices -->
+<?xml version="1.0" encoding="utf-8"?><!-- for large devices -->
 <resources>
     <dimen name="scroll_section_2_font_size">19sp</dimen>
     <dimen name="speedo_font_size">70sp</dimen>

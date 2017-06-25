@@ -40,14 +40,14 @@ public class OdoUnitsPreferenceDialog extends DialogFragment {
         return dialog.create();
     }
 
-    public void setOnClickListener(OdoUnitClickListener odoUnitClickListener){
+    public void setOnClickListener(OdoUnitClickListener odoUnitClickListener) {
         this.odoUnitClickListener = odoUnitClickListener;
     }
 
     DialogInterface.OnClickListener itemClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            if (selectedValue != which){
+            if (selectedValue != which) {
                 selectedValue = which;
                 odoUnitsPreference.edit().putInt("odoUnits", selectedValue).apply();
                 odoUnitClickListener.onOdoUnitClickListener();
@@ -56,7 +56,7 @@ public class OdoUnitsPreferenceDialog extends DialogFragment {
         }
     };
 
-    public interface OdoUnitClickListener{
+    public interface OdoUnitClickListener {
         void onOdoUnitClickListener();
     }
 

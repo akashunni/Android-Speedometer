@@ -16,7 +16,7 @@
         <SwitchPreference
             android:title="LCD digit backlit"
             android:key="lcdBacklit"
-            android:defaultValue="true"/>
+            android:defaultValue="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Location">
         <EditTextPreference
@@ -30,14 +30,13 @@
             android:key="DMS"
             android:summaryOn="Showing location in Degree Minute Second format"
             android:summaryOff="Showing location in Decimal format"
-            android:defaultValue="true"/>
+            android:defaultValue="true" />
         <EditTextPreference
             android:title="Precision"
             android:key="precision"
             android:summary="Number of digits after the decimal point"
             android:defaultValue="4"
-            android:numeric="integer"
-            />
+            android:numeric="integer" />
         <ListPreference
             android:defaultValue="100"
             android:entries="@array/location_accuracy_names"

@@ -14,15 +14,15 @@ public class FontFactory {
         return instance;
     }
 
-    public Typeface getFontForUnits(Context context){
-        if(typeface_units==null){
+    public Typeface getFontForUnits(Context context) {
+        if (typeface_units == null) {
             typeface_units = Typeface.createFromAsset(context.getResources().getAssets(), "fonts/DSEG14ClassicMini-LightItalic.ttf");
         }
         return typeface_units;
     }
 
-    public Typeface getFontForValues(Context context){
-        if(typeface_values==null){
+    public Typeface getFontForValues(Context context) {
+        if (typeface_values == null) {
             typeface_values = Typeface.createFromAsset(context.getResources().getAssets(), "fonts/DSEG14ClassicMini-BoldItalic.ttf");
         }
         return typeface_values;

@@ -36,7 +36,7 @@
         android:text="@string/hyphen_4"
         app:layout_constraintLeft_toLeftOf="@id/speedobg"
         app:layout_constraintTop_toTopOf="@+id/speedobg"
-        app:layout_constraintRight_toRightOf="@id/speedobg"/>
+        app:layout_constraintRight_toRightOf="@id/speedobg" />
 
     <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/speedounitsbg"
@@ -61,7 +61,7 @@
         android:maxLines="1"
         android:textSize="@dimen/speedo_units_font_size"
         app:layout_constraintTop_toTopOf="@id/speedounitsbg"
-        app:layout_constraintLeft_toLeftOf="@id/speedounitsbg"/>
+        app:layout_constraintLeft_toLeftOf="@id/speedounitsbg" />
 
     <com.akashunni.speedometer.Fonts.ValuesTextView
         android:id="@+id/odobg"
@@ -87,7 +87,7 @@
         android:maxLines="1"
         app:layout_constraintLeft_toLeftOf="@id/odobg"
         app:layout_constraintTop_toTopOf="@id/odobg"
-        app:layout_constraintRight_toRightOf="@id/odobg"/>
+        app:layout_constraintRight_toRightOf="@id/odobg" />
 
     <com.akashunni.speedometer.Fonts.UnitsTextView
         android:id="@+id/odounitsbg"

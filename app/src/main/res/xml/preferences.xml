@@ -23,7 +23,7 @@
             android:key="speedLimit"
             android:numeric="decimal"
             android:summary="Set the speed in displayed units."
-            android:defaultValue="40"
+            android:defaultValue="60"
             android:title="Speed Limit" />
         <SwitchPreference
             android:title="Show Location in DMS"

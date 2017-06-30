@@ -610,7 +610,7 @@ public class MainActivity extends FragmentActivity implements
     public void enableLocation() {
         Log.d(TAG, "enableLocation: ");
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "102")));
+        locationRequest.setPriority(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("powerConsumption", "100")));
         locationRequest.setInterval(UPDATE_INTERVAL);
         locationRequest.setFastestInterval(1000);
         locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT);

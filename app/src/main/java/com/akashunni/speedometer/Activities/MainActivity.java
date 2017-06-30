@@ -262,7 +262,7 @@ public class MainActivity extends FragmentActivity implements
 
     public void permissionForSpeedUI() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("To calculate SPEED, you need to enable Location. Click YES to enable Location, NO to continue using the app without Location.")
+        builder.setMessage("To show SPEED & Location, we need to access Location Services. Click YES to enable Location, NO to continue using the app without Location Services.")
                 .setCancelable(false)
                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override

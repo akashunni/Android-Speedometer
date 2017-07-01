@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><!-- for ldpi devices -->
+<resources>
+    <dimen name="scroll_section_2_font_size">15sp</dimen>
+    <dimen name="speedo_font_size">45sp</dimen>
+    <dimen name="speedo_units_font_size">16sp</dimen>
+    <dimen name="odo_font_size">26sp</dimen>
+    <dimen name="odo_units_font_size">14sp</dimen>
+    <dimen name="reset_btn_font">15sp</dimen>
+    <dimen name="reset_btn_height">20dp</dimen>
+</resources>

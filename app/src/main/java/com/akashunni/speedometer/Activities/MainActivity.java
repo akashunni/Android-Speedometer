@@ -139,6 +139,7 @@ public class MainActivity extends FragmentActivity implements
         btn_navigation = (AppCompatImageView) findViewById(R.id.navigation);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
         separator = findViewById(R.id.speedo_sep_horizontal);
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         //Setting onClickListeners to buttons

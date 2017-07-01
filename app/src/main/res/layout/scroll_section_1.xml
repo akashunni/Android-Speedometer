@@ -126,7 +126,7 @@
     <Button
         android:id="@+id/reset"
         android:layout_width="0dp"
-        android:layout_height="25dp"
+        android:layout_height="@dimen/reset_btn_height"
         android:text="@string/reset"
         android:textSize="@dimen/reset_btn_font"
         android:shadowDx="0"

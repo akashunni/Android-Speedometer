@@ -6,10 +6,8 @@
     <string name="instructions">Instructions:</string>
     <string name="instructions_content_1">
         <b>WARNING :</b> If you are using the app while driving, please focus on your driving.\n\nThe displayed values are retrieved using the GPS and Cellular signals.
-        The values shown may not be accurate. The users should not rely on these values as it
-        may display inaccurate results due to certain reasons such as low signal strength.
-        The app is not responsible if any damage is caused by using the values displayed.
-        Keeping the screen on for a long period of time can cause damage to the phone\'s screen.
+        The values shown may not be accurate. The users should not always rely on these values as it
+        may display inaccurate results due to certain reasons such as low signal strengths.
     </string>
     <string name="instructions_content_2">
         To change the units of speed or distance tap on the speed/distance to choose the unit.
@@ -34,4 +32,5 @@
     <string name="longitude">"Longitude</string>
     <string name="altitude">"Altitude (above MSL)"</string>
     <string name="direction">"Direction"</string>
+    <string name="google_maps_key">websdbdsbdsbsdvdsbs</string>
 </resources>

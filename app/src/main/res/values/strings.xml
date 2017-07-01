@@ -32,5 +32,4 @@
     <string name="longitude">"Longitude</string>
     <string name="altitude">"Altitude (above MSL)"</string>
     <string name="direction">"Direction"</string>
-    <string name="google_maps_key">websdbdsbdsbsdvdsbs</string>
 </resources>

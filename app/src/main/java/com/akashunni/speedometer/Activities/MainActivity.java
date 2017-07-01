@@ -106,10 +106,10 @@ public class MainActivity extends FragmentActivity implements
     private long vibratePattern[] = {0, 600, 1000};
     private Location prevLocation = null;
     Location lastLocation;
-    private static boolean showLastLocation = true, currentLocationPressed = false, got_location = false;
+    private static boolean showLastLocation = true, currentLocationPressed = false, got_location = false, mapTypePressed = false;
     private LocationManager locationManager;
     float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0;
-    private String display_distance = "";
+    private String display_distance = "0.0";
     double lat_value = 0, long_value = 0;
     String TAG = "test";
 
@@ -212,6 +212,7 @@ public class MainActivity extends FragmentActivity implements
         outState.putBoolean("showLastLocation", showLastLocation);
         outState.putBoolean("currentLocationPressed", currentLocationPressed);
         outState.putBoolean("got_location", got_location);
+        outState.putBoolean("mapTypePressed", mapTypePressed);
         outState.putFloat("speed", speed);
         outState.putFloat("distance", distance);
         outState.putString("display_distance", display_distance);
@@ -230,6 +231,7 @@ public class MainActivity extends FragmentActivity implements
         showLastLocation = savedInstanceState.getBoolean("showLastLocation");
         currentLocationPressed = savedInstanceState.getBoolean("currentLocationPressed");
         got_location = savedInstanceState.getBoolean("got_location");
+        mapTypePressed = savedInstanceState.getBoolean("mapTypePressed");
         speed = savedInstanceState.getFloat("speed");
         distance = savedInstanceState.getFloat("distance");
         display_distance = savedInstanceState.getString("display_distance");
@@ -312,13 +314,8 @@ public class MainActivity extends FragmentActivity implements
                 fragmentTransaction.commit();
                 break;
             case R.id.mapType:
-                if (googleMap.getMapType() == GoogleMap.MAP_TYPE_NORMAL) {
-                    ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_mapType);
-                    googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                } else {
-                    ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_mapType);
-                    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                }
+                mapTypePressed = !mapTypePressed;
+                setMapType();
                 break;
             case R.id.navigation:
                 Toast.makeText(this, "Coming Soon..!", Toast.LENGTH_SHORT).show();
@@ -368,6 +365,16 @@ public class MainActivity extends FragmentActivity implements
     }
 
     // setting the values
+
+    void setMapType(){
+        if (mapTypePressed) {
+            ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_mapType);
+            googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        } else {
+            ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_mapType);
+            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+    }
 
     void displayLatLngValues() {
         if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("DMS", true)) {
@@ -478,7 +485,7 @@ public class MainActivity extends FragmentActivity implements
             speedRefresh = 0;
         }
 
-        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "40"))) {
+        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "60"))) {
             if (vibrator.hasVibrator()) {
                 vibrator.vibrate(vibratePattern, 0);
             }
@@ -924,6 +931,7 @@ public class MainActivity extends FragmentActivity implements
         googleMap.setTrafficEnabled(true);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         setMapStyle();
+        setMapType();
     }
 
     //Speedo unit click listener

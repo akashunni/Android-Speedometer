@@ -366,7 +366,7 @@ public class MainActivity extends FragmentActivity implements
 
     // setting the values
 
-    void setMapType(){
+    void setMapType() {
         if (mapTypePressed) {
             ChangeColor.ofButtonDrawableToActive(getApplicationContext(), btn_mapType);
             googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);

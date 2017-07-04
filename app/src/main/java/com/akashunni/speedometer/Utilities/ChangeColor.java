@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.AppCompatImageView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,17 +25,19 @@ public class ChangeColor {
     public static void ofButtonDrawableToNormal(Context context, AppCompatImageView imageView) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
             DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(context, R.color.pureWhite));
+            Log.d("test", "ofButtonDrawableToNormal1: true");
         } else {
             DrawableCompat.setTint(imageView.getDrawable(), ContextCompat.getColor(context, R.color.pitchBlack));
+            Log.d("test", "ofButtonDrawableToNormal1: false");
         }
     }
 
     public static void ofButtonDrawableToNormal(Context context, Button button) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("theme", true)) {
-            DrawableCompat.setTint(button.getBackground(), ContextCompat.getColor(context, R.color.pureWhite));
+            DrawableCompat.setTint(DrawableCompat.wrap(button.getBackground()).mutate(), ContextCompat.getColor(context, R.color.pureWhite));
             button.setTextColor(context.getResources().getColor(R.color.pitchBlack));
         } else {
-            DrawableCompat.setTint(button.getBackground(), ContextCompat.getColor(context, R.color.pitchBlack));
+            DrawableCompat.setTint(DrawableCompat.wrap(button.getBackground()).mutate(), ContextCompat.getColor(context, R.color.pitchBlack));
             button.setTextColor(context.getResources().getColor(R.color.pureWhite));
         }
     }

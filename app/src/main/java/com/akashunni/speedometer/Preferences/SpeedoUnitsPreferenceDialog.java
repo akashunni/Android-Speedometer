@@ -18,7 +18,7 @@ import com.akashunni.speedometer.R;
 
 public class SpeedoUnitsPreferenceDialog extends DialogFragment {
     private String[] speedoUnits;
-    private int selectedValue;
+    private int selectedValue = 0;
     private SharedPreferences speedoUnitsPreference;
     private SpeedoUnitClickListener speedoUnitClickListener;
 

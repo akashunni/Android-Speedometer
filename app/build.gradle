@@ -15,8 +15,8 @@ android {
         applicationId "com.akashunni.speedometer"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 7
-        versionName "1.0.3"
+        versionCode 8
+        versionName "1.0.4"
         // Enabling multidex support.
         multiDexEnabled true
         //Enabling vector support

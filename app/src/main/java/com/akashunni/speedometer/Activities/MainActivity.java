@@ -38,6 +38,7 @@ import com.akashunni.speedometer.Fonts.UnitsTextView;
 import com.akashunni.speedometer.Fonts.ValuesTextView;
 import com.akashunni.speedometer.Preferences.OdoUnitsPreferenceDialog;
 import com.akashunni.speedometer.Preferences.SharedPrefs;
+import com.akashunni.speedometer.Preferences.SpeedLimitPreferenceDialog;
 import com.akashunni.speedometer.Preferences.SpeedoUnitsPreferenceDialog;
 import com.akashunni.speedometer.R;
 import com.akashunni.speedometer.Utilities.ChangeColor;
@@ -106,6 +107,7 @@ public class MainActivity extends FragmentActivity implements
     private long vibratePattern[] = {0, 600, 1000};
     private Location prevLocation = null;
     Location lastLocation;
+    public static String speedUnits = "";
     private static boolean showLastLocation = true, currentLocationPressed = false, got_location = false, mapTypePressed = false;
     private LocationManager locationManager;
     float speed = 0, distance = 0, alt_value = 0, acc_value = 0, degrees = 0;
@@ -136,7 +138,7 @@ public class MainActivity extends FragmentActivity implements
         btn_currLoc = (AppCompatImageView) findViewById(R.id.currLoc);
         btn_search = (AppCompatImageView) findViewById(R.id.search);
         btn_mapType = (AppCompatImageView) findViewById(R.id.mapType);
-        btn_navigation = (AppCompatImageView) findViewById(R.id.navigation);
+        btn_navigation = (AppCompatImageView) findViewById(R.id.speedLimit);
         btn_settings = (AppCompatImageView) findViewById(R.id.settings);
         separator = findViewById(R.id.speedo_sep_horizontal);
 
@@ -317,8 +319,9 @@ public class MainActivity extends FragmentActivity implements
                 mapTypePressed = !mapTypePressed;
                 setMapType();
                 break;
-            case R.id.navigation:
-                Toast.makeText(this, "Coming Soon..!", Toast.LENGTH_SHORT).show();
+            case R.id.speedLimit:
+                SpeedLimitPreferenceDialog speedLimitPreferenceDialog = new SpeedLimitPreferenceDialog();
+                speedLimitPreferenceDialog.show(fragmentManager, "speedLimit");
                 break;
             case R.id.settings:
                 Intent i = new Intent(getApplicationContext(), AppSettings.class);
@@ -467,6 +470,7 @@ public class MainActivity extends FragmentActivity implements
                 speedoUnits.setText(R.string.mt_sec);
                 break;
         }
+        speedUnits = speedoUnits.getText().toString();
         if (got_location) {
             setSpeedoValues();
         }

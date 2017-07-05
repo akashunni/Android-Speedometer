@@ -30,16 +30,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/map_type_white"
-        app:layout_constraintRight_toLeftOf="@+id/navigation"
+        app:layout_constraintRight_toLeftOf="@+id/speedLimit"
         app:layout_constraintLeft_toRightOf="@+id/search"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp" />
 
     <android.support.v7.widget.AppCompatImageView
-        android:id="@+id/navigation"
+        android:id="@+id/speedLimit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_navigation_white"
+        app:srcCompat="@drawable/ic_add_alert_white"
         app:layout_constraintLeft_toRightOf="@+id/mapType"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp"
@@ -53,5 +53,5 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp"
-        app:layout_constraintLeft_toRightOf="@+id/navigation" />
+        app:layout_constraintLeft_toRightOf="@+id/speedLimit" />
 </android.support.constraint.ConstraintLayout>

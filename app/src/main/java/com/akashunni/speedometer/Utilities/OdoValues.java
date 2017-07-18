@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 import com.akashunni.speedometer.R;
 
+import java.util.Locale;
+
 /**
  * Created by akash on 25/5/17.
  */
@@ -16,13 +18,13 @@ public class OdoValues {
         switch (PreferenceManager.getDefaultSharedPreferences(context).getInt("odoUnits", 0)) {
             // km
             case 0:
-                return String.format("%4.1f", distance / 1000);
+                return String.format(Locale.US, "%4.1f", distance / 1000);
             // miles
             case 1:
-                return String.format("%4.1f", (distance / 1609.344));
+                return String.format(Locale.US, "%4.1f", (distance / 1609.344));
             // meter
             case 2:
-                return String.format("%3.2f", distance);
+                return String.format(Locale.US, "%3.2f", distance);
             // error
             default:
                 return context.getResources().getString(R.string.hyphen_5);

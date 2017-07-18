@@ -73,6 +73,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Locale;
+
 public class MainActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -485,7 +487,7 @@ public class MainActivity extends FragmentActivity implements
         } else if (speed > 999.99) {
             speedo.setText("high");
         } else {
-            speedo.setText(String.format("%3.01f", speed));
+            speedo.setText(String.format(Locale.US,"%3.01f", speed));
             speedRefresh = 0;
         }
 
@@ -519,11 +521,16 @@ public class MainActivity extends FragmentActivity implements
 
     void setOdoValues() {
         display_distance = OdoValues.getDisplayDistance(getApplicationContext(), distance);
-        if (Float.parseFloat(display_distance) <= 999.99) {
-            Log.d(TAG, "setOdoValues: " + display_distance);
+        if (display_distance.equals(getResources().getString(R.string.hyphen_5))) {
             odo.setText(display_distance);
         } else {
-            distance = 0;
+            if (Float.parseFloat(display_distance) <= 999.99) {
+                Log.d(TAG, "setOdoValues: " + display_distance);
+                odo.setText(display_distance);
+            } else {
+                odo.setText(getResources().getString(R.string.reset));
+                Toast.makeText(this, "Reset or change Odo Units.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

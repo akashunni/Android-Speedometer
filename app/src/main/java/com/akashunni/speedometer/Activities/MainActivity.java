@@ -72,6 +72,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Locale;
 
@@ -95,6 +96,7 @@ public class MainActivity extends FragmentActivity implements
     private TextView latitude, longitude, altitude, direction, accuracy;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
+    private FirebaseAnalytics firebaseAnalytics;
     private SupportMapFragment mapFragment;
     private PlaceAutocompleteFragment searchFragment;
     private AppCompatImageView btn_currLoc, btn_search, btn_mapType, btn_navigation, btn_settings;
@@ -208,6 +210,9 @@ public class MainActivity extends FragmentActivity implements
         // setting speedo & odo units
         setSpeedoUnits();
         setOdoUnits();
+
+        //Firebase Analytics
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     // save values on rotation
@@ -300,11 +305,15 @@ public class MainActivity extends FragmentActivity implements
     // onClick listener for buttons
     @Override
     public void onClick(View v) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("ButtonData", v.getId());
+        String btnName = "NONE";
         switch (v.getId()) {
             case R.id.currLoc:
                 currentLocationPressed = !currentLocationPressed;
                 Log.d(TAG, "Current Location Pressed = " + currentLocationPressed);
                 trackCurrentLocation(true);
+                btnName = "Curr_Loc_Btn";
                 break;
             case R.id.search:
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -316,35 +325,43 @@ public class MainActivity extends FragmentActivity implements
                     ChangeColor.ofButtonDrawableToNormal(getApplicationContext(), btn_search);
                 }
                 fragmentTransaction.commit();
+                btnName = "Search_Btn";
                 break;
             case R.id.mapType:
                 mapTypePressed = !mapTypePressed;
                 setMapType();
+                btnName = "Map_Type_Btn";
                 break;
             case R.id.speedLimit:
                 SpeedLimitPreferenceDialog speedLimitPreferenceDialog = new SpeedLimitPreferenceDialog();
                 speedLimitPreferenceDialog.show(fragmentManager, "speedLimit");
+                btnName = "Speed_Limit_Btn";
                 break;
             case R.id.settings:
                 Intent i = new Intent(getApplicationContext(), AppSettings.class);
                 startActivity(i);
+                btnName = "Settings_Btn";
                 break;
             case R.id.speedounits:
             case R.id.speedo:
                 SpeedoUnitsPreferenceDialog speedoUnitsPreferenceDialog = new SpeedoUnitsPreferenceDialog();
                 speedoUnitsPreferenceDialog.show(fragmentManager, "speedoUnits");
                 speedoUnitsPreferenceDialog.setOnClickListener(this);
+                btnName = "Speedo_Units";
                 break;
             case R.id.odounits:
             case R.id.odo:
                 OdoUnitsPreferenceDialog odoUnitsPreferenceDialog = new OdoUnitsPreferenceDialog();
                 odoUnitsPreferenceDialog.show(fragmentManager, "odoUnits");
                 odoUnitsPreferenceDialog.setOnClickListener(this);
+                btnName = "Odo_Units";
                 break;
             case R.id.reset:
                 Toast.makeText(this, "Long Press the button to RESET.", Toast.LENGTH_SHORT).show();
+                btnName = "Reset_Btn";
                 break;
         }
+        firebaseAnalytics.logEvent(btnName, bundle);
     }
 
     @Override

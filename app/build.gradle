@@ -15,8 +15,8 @@ android {
         applicationId "com.akashunni.speedometer"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 9
-        versionName "1.0.5"
+        versionCode 11
+        versionName "1.1.1"
         // Enabling multidex support.
         multiDexEnabled true
         //Enabling vector support
@@ -48,5 +48,9 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.google.firebase:firebase-core:10.0.1'
     testCompile 'junit:junit:4.12'
 }
+
+
+apply plugin: 'com.google.gms.google-services'

@@ -508,8 +508,8 @@ public class MainActivity extends FragmentActivity implements
             speedRefresh = 0;
         }
 
-        if (speed >= Float.parseFloat(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("speedLimit", "60"))) {
-            if (vibrator.hasVibrator()) {
+        if (speed >= PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getFloat(getResources().getString(R.string.speedlimitvalue), 40)) {
+            if (vibrator.hasVibrator() && PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("vibration", true)) {
                 vibrator.vibrate(vibratePattern, 0);
             }
             ChangeColor.ofTextView(speedo, getResources().getColor(R.color.red));

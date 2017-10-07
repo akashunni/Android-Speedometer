@@ -18,6 +18,13 @@
             android:key="lcdBacklit"
             android:defaultValue="true" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Speed Limit">
+        <SwitchPreference
+            android:title="Vibration"
+            android:key="vibration"
+            android:summary="Vibrate on exceeding speed limit"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="Location">
         <SwitchPreference
             android:title="Show Location in DMS"

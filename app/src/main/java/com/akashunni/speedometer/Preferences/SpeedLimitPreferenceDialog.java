@@ -36,7 +36,7 @@ public class SpeedLimitPreferenceDialog extends DialogFragment {
         final EditText edittext = new EditText(getContext());
         edittext.setInputType(InputType.TYPE_CLASS_NUMBER);
         edittext.setPadding(50,0,30,50);
-        edittext.setText(String.valueOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getFloat("speedLimit", 40)));
+        edittext.setText(String.valueOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getFloat(getResources().getString(R.string.speedlimitvalue), 40)));
         dialog.setTitle("Speed Limit");
         dialog.setMessage("Set the speed in "+ MainActivity.speedUnits.toUpperCase());
         dialog.setView(edittext);
@@ -45,7 +45,7 @@ public class SpeedLimitPreferenceDialog extends DialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 PreferenceManager.getDefaultSharedPreferences(getContext())
                         .edit()
-                        .putFloat("speedLimit",Float.parseFloat(edittext.getText().toString()))
+                        .putFloat(getResources().getString(R.string.speedlimitvalue), Float.parseFloat(edittext.getText().toString()))
                         .apply();
             }
         });
